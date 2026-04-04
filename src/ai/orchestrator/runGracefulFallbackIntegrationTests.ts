@@ -1,0 +1,15 @@
+import { runGracefulFallbackIntegrationTests } from './gracefulFallback.integration';
+
+const main = async (): Promise<void> => {
+  try {
+    await runGracefulFallbackIntegrationTests();
+    console.log('PASS: graceful fallback integration tests');
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error('FAIL: graceful fallback integration tests');
+    console.error(message);
+    process.exit(1);
+  }
+};
+
+void main();
