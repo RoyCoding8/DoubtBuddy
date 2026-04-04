@@ -1,6 +1,6 @@
 # DoubtBuddy (JEE AI Study App)
 
-Mobile-first React Native (Expo) app for JEE preparation with AI-assisted doubt solving, practice mode, revision scheduler, and progress analytics.
+DoubtBuddy helps JEE students solve doubts, practice smarter, revise with spaced repetition, and track progress in one app.
 
 ## Highlights
 
