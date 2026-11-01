@@ -3,7 +3,7 @@ set -uo pipefail
 
 mkdir -p evidence
 status=0
-gradle --no-daemon :app:connectedDebugAndroidTest || status=$?
+./gradlew --no-daemon :app:connectedDebugAndroidTest || status=$?
 
 if adb install -r app/build/outputs/apk/debug/app-debug.apk &&
    adb shell am start -n dev.doubtbuddy/.MainActivity; then
