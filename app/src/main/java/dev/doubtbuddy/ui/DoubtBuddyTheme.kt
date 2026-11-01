@@ -1,11 +1,15 @@
 package dev.doubtbuddy.ui
 
+import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.dynamicDarkColorScheme
+import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 
 private val light = lightColorScheme(
     primary = Color(0xFF445D9D),
@@ -34,5 +38,13 @@ private val dark = darkColorScheme(
 
 @Composable
 fun DoubtBuddyTheme(content: @Composable () -> Unit) {
-    MaterialTheme(colorScheme = if (isSystemInDarkTheme()) dark else light, content = content)
+    val night = isSystemInDarkTheme()
+    val context = LocalContext.current
+    val scheme = when {
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && night -> dynamicDarkColorScheme(context)
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> dynamicLightColorScheme(context)
+        night -> dark
+        else -> light
+    }
+    MaterialTheme(colorScheme = scheme, content = content)
 }
