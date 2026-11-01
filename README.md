@@ -8,7 +8,7 @@ DoubtBuddy is a native JEE study companion for Physics, Chemistry and Mathematic
 - iOS: Swift, SwiftUI, native system materials, file-backed JSON and Keychain.
 - No Expo, React Native or JavaScript UI runtime.
 
-Both clients provide text and image questions, four answer styles, history, bookmarks, offline practice, spaced review and progress. The offline question bank currently has 18 curated questions. Without an API key, AI answers are clearly marked local previews, not real solutions.
+Both clients provide text and image questions, four answer styles, history, bookmarks, offline practice, spaced review and progress. On Android, question photos are taken with the system camera only; there is no gallery picker or camera permission request. iOS still uses its native photo picker. The offline question bank currently has 18 curated questions. Without an API key, AI answers are clearly marked local previews, not real solutions.
 
 ## Android
 
