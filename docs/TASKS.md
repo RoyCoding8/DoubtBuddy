@@ -15,7 +15,8 @@
 
 ## Verification in progress and outstanding
 
-- [x] Android instrumented study journeys pass and screenshot inspected. Workflows 41293011178 and 41293504807.
+- [x] Android instrumented study journeys pass and native screenshot inspected. Workflows 41293011178 and 41294583367.
+- [x] Light-mode Android system-bar contrast verified visually after foreground screenshot capture. Workflow 41294583367.
 - [x] Gemini mock HTTP request and rate-limit unit tests pass in CI. Android CI 41292245028.
 - [x] Latest iOS layout screenshot inspected and its build passes. iOS CI 41291952584.
 - [x] iOS native tab navigation passes XCTest on the simulator. iOS CI 41292598272.

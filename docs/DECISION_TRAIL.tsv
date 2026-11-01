@@ -16,3 +16,4 @@ ts	phase	decision	why	evidence	result
 2026-11-01T09:37:55Z	android	Capture and inspect native Material 3 screen after passing UI tests	Experience first; distinguish compile from visible app	workflow 41293504807; evidence/android-home.png	VERIFIED
 2026-11-01T09:39:44Z	ios	Verify offline question remains saved after app termination	Prove actual persistence across process relaunch	workflow 41293790329; ios/DoubtBuddyUITests/DoubtBuddyUITests.swift	VERIFIED
 2026-11-01T09:39:43Z	android	Reopen SQLite database after saving a doubt	Test storage behavior at the real device boundary	workflow 41293658080; app/src/androidTest/java/dev/doubtbuddy/StudyStorageTest.kt	VERIFIED
+2026-11-01T09:53:51Z	android	Capture app before instrumentation and verify real foreground screen	Avoid launcher ANR masking the Material 3 screenshot	workflow 41294583367; evidence/android-home.png	VERIFIED
