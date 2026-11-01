@@ -17,3 +17,4 @@ ts	phase	decision	why	evidence	result
 2026-11-01T09:39:44Z	ios	Verify offline question remains saved after app termination	Prove actual persistence across process relaunch	workflow 41293790329; ios/DoubtBuddyUITests/DoubtBuddyUITests.swift	VERIFIED
 2026-11-01T09:39:43Z	android	Reopen SQLite database after saving a doubt	Test storage behavior at the real device boundary	workflow 41293658080; app/src/androidTest/java/dev/doubtbuddy/StudyStorageTest.kt	VERIFIED
 2026-11-01T09:53:51Z	android	Capture app before instrumentation and verify real foreground screen	Avoid launcher ANR masking the Material 3 screenshot	workflow 41294583367; evidence/android-home.png	VERIFIED
+2026-11-01	android-camera	Replace general file picker with system camera-only capture	Experience First and Subtract Before You Add; avoid extra permission and retain full-resolution input	commit 8b417d0; app/src/main/java/dev/doubtbuddy/data/CameraCapture.kt	PENDING VERIFICATION

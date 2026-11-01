@@ -13,6 +13,11 @@
 - [x] Commit official Gradle 8.14.3 wrapper for reproducible Android builds.
 - [x] Add Android instrumented test workflow and iOS simulator screenshot capture.
 
+## Camera-only question input
+
+- [ ] Verify modern Android system camera capture, temporary FileProvider URI, photo resizing, and cancellation on emulator.
+- [ ] Inspect camera-only question interface and rerun all Android UI journeys.
+
 ## Verification in progress and outstanding
 
 - [x] Android instrumented study journeys pass and native screenshot inspected. Workflows 41293011178 and 41294583367.

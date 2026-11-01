@@ -1,5 +1,14 @@
 package dev.doubtbuddy
 
+import android.app.Activity
+import android.app.Instrumentation
+import android.provider.MediaStore
+import androidx.test.espresso.intent.Intents
+import androidx.test.espresso.intent.Intents.intended
+import androidx.test.espresso.intent.Intents.intending
+import androidx.test.espresso.intent.matcher.IntentMatchers.hasAction
+import androidx.test.espresso.intent.matcher.IntentMatchers.hasExtraWithKey
+import org.hamcrest.Matchers.allOf
 import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
@@ -30,6 +39,22 @@ class StudyJourneyTest {
         compose.onNodeWithText("Saved").performClick()
         compose.onNodeWithText("Saved answers").assertExists()
         compose.onNodeWithText("What is Newton's second law?").assertExists()
+    }
+
+    @Test fun takePhotoLaunchesSystemCameraWithOutputUri() {
+        Intents.init()
+        try {
+            intending(hasAction(MediaStore.ACTION_IMAGE_CAPTURE))
+                .respondWith(Instrumentation.ActivityResult(Activity.RESULT_CANCELED, null))
+            compose.onNodeWithText("Take photo").performClick()
+            intended(allOf(
+                hasAction(MediaStore.ACTION_IMAGE_CAPTURE),
+                hasExtraWithKey(MediaStore.EXTRA_OUTPUT)
+            ))
+            compose.onNodeWithText("Take photo").assertExists()
+        } finally {
+            Intents.release()
+        }
     }
 
     @Test fun practiceShowsExplanationAndProgress() {
