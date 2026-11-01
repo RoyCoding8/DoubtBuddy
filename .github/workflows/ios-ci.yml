@@ -28,3 +28,19 @@ jobs:
         with:
           name: DoubtBuddy-iOS-simulator
           path: ios/DerivedData/Build/Products/Debug-iphonesimulator/DoubtBuddy.app
+      - name: Boot simulator and capture native screen
+        run: |
+          DEVICE=$(xcrun simctl list devices available -j | python3 -c 'import json,sys; d=json.load(sys.stdin)["devices"]; print(next((x["udid"] for group in d.values() for x in group if "iPhone" in x["name"] and x["state"] == "Shutdown"), ""))')
+          test -n "$DEVICE"
+          xcrun simctl boot "$DEVICE"
+          xcrun simctl bootstatus "$DEVICE" -b
+          xcrun simctl install "$DEVICE" ios/DerivedData/Build/Products/Debug-iphonesimulator/DoubtBuddy.app
+          xcrun simctl launch "$DEVICE" dev.doubtbuddy.ios
+          sleep 7
+          mkdir -p evidence
+          xcrun simctl io "$DEVICE" screenshot evidence/ios-home.png
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: iOS-simulator-evidence
+          path: evidence/**
