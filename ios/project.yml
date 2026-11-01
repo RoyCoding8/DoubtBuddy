@@ -8,6 +8,9 @@ targets:
     deploymentTarget: "17.0"
     sources:
       - DoubtBuddy
+    scheme:
+      testTargets:
+        - DoubtBuddyUITests
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: dev.doubtbuddy.ios
@@ -16,3 +19,16 @@ targets:
         SWIFT_VERSION: "5.0"
         CODE_SIGNING_ALLOWED: NO
         TARGETED_DEVICE_FAMILY: "1,2"
+
+  DoubtBuddyUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      - DoubtBuddyUITests
+    dependencies:
+      - target: DoubtBuddy
+    settings:
+      base:
+        SWIFT_VERSION: "5.0"
+        CODE_SIGNING_ALLOWED: NO

@@ -40,6 +40,13 @@ jobs:
           sleep 7
           mkdir -p evidence
           xcrun simctl io "$DEVICE" screenshot evidence/ios-home.png
+      - name: Run native UI navigation test
+        run: |
+          DEVICE=$(xcrun simctl list devices booted -j | python3 -c 'import json,sys; d=json.load(sys.stdin)["devices"]; print(next((x["udid"] for group in d.values() for x in group if x["state"] == "Booted"), ""))')
+          test -n "$DEVICE"
+          xcodebuild -project ios/DoubtBuddy.xcodeproj -scheme DoubtBuddy -configuration Debug \
+            -destination "platform=iOS Simulator,id=$DEVICE" -derivedDataPath ios/DerivedData \
+            -parallel-testing-enabled NO CODE_SIGNING_ALLOWED=NO test
       - uses: actions/upload-artifact@v4
         if: always()
         with:
