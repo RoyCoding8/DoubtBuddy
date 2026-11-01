@@ -9,7 +9,7 @@ import org.json.JSONObject
 
 data class ImageAttachment(val mimeType: String, val base64: String)
 
-class GeminiClient {
+class GeminiClient(private val endpoint: URL = URL("https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent")) {
     fun solve(
         apiKey: String,
         subject: Subject,
@@ -30,8 +30,7 @@ class GeminiClient {
             .put("contents", JSONArray().put(JSONObject().put("role", "user").put("parts", parts)))
             .put("generationConfig", JSONObject().put("maxOutputTokens", 2048))
 
-        val connection = URL("https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent")
-            .openConnection() as HttpURLConnection
+        val connection = endpoint.openConnection() as HttpURLConnection
         return try {
             connection.requestMethod = "POST"
             connection.connectTimeout = 15_000
