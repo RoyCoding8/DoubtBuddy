@@ -1,0 +1,30 @@
+name: iOS native CI
+on:
+  push:
+    branches: [rebuild/native-from-scratch]
+    paths:
+      - "ios/**"
+      - ".github/workflows/ios-ci.yml"
+  workflow_dispatch:
+jobs:
+  ios:
+    runs-on: macos-15
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install XcodeGen
+        run: brew install xcodegen
+      - name: Generate native project
+        run: cd ios && xcodegen generate
+      - name: Compile iOS simulator app
+        run: |
+          xcodebuild -project ios/DoubtBuddy.xcodeproj -scheme DoubtBuddy -configuration Debug \
+            -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath ios/DerivedData CODE_SIGNING_ALLOWED=NO build
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: DoubtBuddy-iOS-simulator
+          path: ios/DerivedData/Build/Products/Debug-iphonesimulator/DoubtBuddy.app
