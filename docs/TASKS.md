@@ -15,11 +15,13 @@
 
 ## Verification in progress and outstanding
 
-- [ ] Android instrumented study journeys pass and screenshots are inspected.
+- [x] Android instrumented study journeys pass and screenshot inspected. Workflows 41293011178 and 41293504807.
 - [x] Gemini mock HTTP request and rate-limit unit tests pass in CI. Android CI 41292245028.
 - [x] Latest iOS layout screenshot inspected and its build passes. iOS CI 41291952584.
 - [x] iOS native tab navigation passes XCTest on the simulator. iOS CI 41292598272.
-- [ ] Data survives app process restart on both platforms, verified by real instrumentation.
+- [x] iOS offline answer survives app termination and relaunch. XCTest workflow 41293790329.
+- [x] Android saved answer survives database close and reopen. Instrumented workflow 41293658080.
+- [ ] Android history survives full app process termination and relaunch (not yet directly tested).
 - [ ] Live Gemini response verified with a consenting authorized test key and usage limits.
 - [ ] Accessibility, privacy, performance and physical-device release checks.
 
