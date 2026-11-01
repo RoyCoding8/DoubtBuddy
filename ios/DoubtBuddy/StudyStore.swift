@@ -51,9 +51,9 @@ enum GeminiService {
         let payload: [String: Any] = [
             "systemInstruction": ["parts": [["text": prompt]]],
             "contents": [["role": "user", "parts": parts]],
-            "generationConfig": ["temperature": 0.3, "maxOutputTokens": 2048]
+            "generationConfig": ["maxOutputTokens": 2048]
         ]
-        let url = URL(string: "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent")!
+        let url = URL(string: "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent")!
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.timeoutInterval = 60

@@ -28,9 +28,9 @@ class GeminiClient {
         val payload = JSONObject()
             .put("systemInstruction", JSONObject().put("parts", JSONArray().put(JSONObject().put("text", instruction))))
             .put("contents", JSONArray().put(JSONObject().put("role", "user").put("parts", parts)))
-            .put("generationConfig", JSONObject().put("temperature", 0.3).put("maxOutputTokens", 2048))
+            .put("generationConfig", JSONObject().put("maxOutputTokens", 2048))
 
-        val connection = URL("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent")
+        val connection = URL("https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent")
             .openConnection() as HttpURLConnection
         return try {
             connection.requestMethod = "POST"
