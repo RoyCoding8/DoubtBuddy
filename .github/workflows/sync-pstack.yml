@@ -1,0 +1,31 @@
+name: Install pstack
+on:
+  push:
+    branches: [rebuild/native-from-scratch]
+    paths:
+      - .github/workflows/sync-pstack.yml
+      - scripts/sync-pstack.sh
+      - scripts/check-pstack.mjs
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  install:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: bash scripts/sync-pstack.sh
+      - name: Commit installed skills
+        run: |
+          git add pstack
+          if git diff --cached --quiet; then
+            echo 'Skills already match pinned source'
+          else
+            git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'chore: vendor all pstack skills at pinned revision'
+            git push origin HEAD:rebuild/native-from-scratch
+          fi
