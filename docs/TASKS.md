@@ -16,8 +16,8 @@
 ## Camera-only question input
 
 - [x] Replace gallery input with system camera-only capture; Android compile and unit tests passed in run 41310283465.
-- [ ] Verify camera intent, temporary FileProvider URI, photo resizing and cancellation on emulator.
-- [ ] Inspect camera-only question interface and rerun all Android UI journeys.
+- [x] Verify camera intent, FileProvider URI, image preparation, and cancellation on emulator. Run 41310283489: 5 tests passed.
+- [x] Inspect camera-only Material 3 question screen and rerun Android UI journeys. Screenshot captured in run 41310283489.
 
 ## Verification in progress and outstanding
 
