@@ -14,9 +14,9 @@ Both clients provide text and image questions, four answer styles, history, book
 
 Open the root directory in Android Studio with JDK 17 and Android SDK 36. Run the app configuration on Android API 26+.
 
-Gradle 8.14.3 command:
+The repository includes the Gradle 8.14.3 wrapper:
 
-    gradle :app:testDebugUnitTest :app:assembleDebug
+    ./gradlew :app:testDebugUnitTest :app:assembleDebug
 
 Android CI: https://github.com/RoyCoding8/DoubtBuddy/actions/workflows/native-ci.yml
 
@@ -32,7 +32,7 @@ On macOS with Xcode and XcodeGen:
     xcodegen generate
     open DoubtBuddy.xcodeproj
 
-Select the DoubtBuddy simulator scheme and run. The iOS CI workflow compiles and boots the app, recording screenshots:
+Select the DoubtBuddy simulator scheme and run. The iOS CI workflow compiles, boots the app, runs XCTest UI navigation checks, and records screenshots:
 
 https://github.com/RoyCoding8/DoubtBuddy/actions/workflows/ios-ci.yml
 

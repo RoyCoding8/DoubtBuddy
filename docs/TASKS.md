@@ -10,13 +10,15 @@
 - [x] Add bring-your-own-key Gemini 3.8 Flash inference with secure key storage.
 - [x] Add local history, bookmarks, 18-question offline practice, spaced review and progress on both platforms.
 - [x] Add JVM unit tests, CI-produced Android APK and iOS simulator app.
+- [x] Commit official Gradle 8.14.3 wrapper for reproducible Android builds.
 - [x] Add Android instrumented test workflow and iOS simulator screenshot capture.
 
 ## Verification in progress and outstanding
 
 - [ ] Android instrumented study journeys pass and screenshots are inspected.
-- [ ] Gemini mock HTTP request and rate-limit unit tests pass in CI.
-- [ ] Latest iOS layout screenshot inspected and its build passes.
+- [x] Gemini mock HTTP request and rate-limit unit tests pass in CI. Android CI 41292245028.
+- [x] Latest iOS layout screenshot inspected and its build passes. iOS CI 41291952584.
+- [x] iOS native tab navigation passes XCTest on the simulator. iOS CI 41292598272.
 - [ ] Data survives app process restart on both platforms, verified by real instrumentation.
 - [ ] Live Gemini response verified with a consenting authorized test key and usage limits.
 - [ ] Accessibility, privacy, performance and physical-device release checks.
