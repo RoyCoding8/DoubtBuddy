@@ -1,0 +1,11 @@
+ts	phase	decision	why	evidence	result
+2026-11-01T09:20:00Z	ground	Inspect rebuild branch and legacy Expo app	Subtract before adding; do not port Expo code	branch rebuild/native-from-scratch; docs/REBUILD_PLAN.md	VERIFIED
+2026-11-01T09:21:00Z	scaffold	Vendor pinned pstack and validator	Build the lever; skills load on demand	commit 6b6a142; installer workflow	success
+2026-11-01T09:40:00Z	scaffold	Create native Android Compose Material 3 shell	Foundational thinking; define domain types early	Android CI 41289968318	success
+2026-11-01T09:48:00Z	domain	Add SQLite persistence and offline practice bank	Model domain and separate UI from storage	commit cc2bb281; Android CI 41290140127	success
+2026-11-01T09:50:00Z	ai	Use encrypted BYOK Gemini API boundary	Boundary discipline; no embedded shared secret	commit 8808daae; Android CI 41290216626	compiled; live API unverified
+2026-11-01T09:51:00Z	android	Add native Material 3 study UI	Experience first; prioritize core learner loop	commit 0948afe; Android CI 41290563151	compiled
+2026-11-01T09:55:00Z	ios	Add native SwiftUI study app	Platform-native UI rather than JS bridge	commit e32b92ab; iOS CI 41290819453	compiled
+2026-11-01T09:58:00Z	verify	Launch iOS simulator and inspect screenshot	Prove it works beyond compile	workflow 41290979284; screenshot artifact 13077002905	launched; layout iteration ongoing
+2026-11-01T10:00:00Z	verify	Add Android UI and mock Gemini tests	Test behavior, not implementation	commit 7292f827; commit 97ae2975	in progress
+2026-11-01T10:03:00Z	fix	Replace internal JDK HTTP test server	Use supported test network boundary	commit cae3ef64	CI pending

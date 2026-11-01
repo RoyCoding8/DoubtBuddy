@@ -8,7 +8,7 @@ The rebuild branch is `rebuild/native-from-scratch`. The branch began with `LICE
 
 ## Technical direction
 
-Android first with Kotlin, Jetpack Compose, coroutines, and Room for local persistence. iOS follows with Swift and SwiftUI plus SwiftData or SQLite as needed. Keep domain semantics and JSON API contracts aligned, not UI code. Do not use Expo, React Native, or a JavaScript UI runtime.
+Android first with Kotlin, Jetpack Compose, coroutines, and SQLiteOpenHelper for local persistence. iOS follows with Swift and SwiftUI plus file-backed Codable JSON for local data. Keep domain semantics and JSON API contracts aligned, not UI code. Do not use Expo, React Native, or a JavaScript UI runtime.
 
 Model the core domain before adding screens:
 
@@ -18,7 +18,7 @@ Model the core domain before adding screens:
 - `Doubt`: stable identifier, source prompt, answer, created time, source metadata.
 - `SolveState`: idle, submitting, answered, failed; make mutually exclusive states explicit.
 
-A mock offline answer adapter can verify the user journey without secrets or a deployed backend. Production inference must use a documented, authenticated API boundary. Never bundle provider API secrets in either client. Keep sensitive data in platform-protected storage and restrict telemetry.
+A mock offline answer adapter can verify the user journey without secrets or a deployed backend. The development MVP supports direct Gemini calls using each user's own API key, encrypted through Android Keystore or iOS Keychain. Public app-managed inference requires an authenticated backend. Never bundle an app-owned provider secret in either client. Keep sensitive data in platform-protected storage and restrict telemetry.
 
 ## Delivery phases
 
@@ -61,4 +61,4 @@ For the native first slice, success means a fresh install launches, the student 
 
 ## Open risks
 
-Native Android and iOS SDKs and emulators are not guaranteed in the current chat container. Remote Android CI can compile, but interactive simulator verification needs an environment capable of running the app. No implementation-specific backend plan was present in the available repository, so inference deployment requires later scope decisions.
+Both apps now compile through GitHub Actions. iOS boot and screenshot capture has passed in CI. Android on-device journeys, persistence-after-relaunch tests and physical device checks are separate verification gates. No implementation-specific backend plan was present in the available repository, so inference deployment requires later scope decisions.

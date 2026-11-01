@@ -1,13 +1,31 @@
 # Rebuild task list
 
-- [x] Inspect repository and identify the clean rebuild branch.
-- [x] Review pstack router and relevant principles.
-- [x] Establish a first-principles native rebuild plan.
-- [x] Vendor all pinned pstack skills, references, and scripts on the rebuild branch. Verified 58 skill entry points and successful GitHub Actions installation.
-- [ ] Build the Android Kotlin/Compose app scaffold and verify it compiles.
-- [ ] Implement the first usable offline text-doubt slice.
-- [ ] Connect a secure, tested inference boundary and verify network failure states.
-- [ ] Add history, practice, revision, and progress in independently verified increments.
-- [ ] Implement and verify a native SwiftUI client.
+## Built and compiled
 
-Each completed milestone must include a commit and evidence. Native device or emulator behavior is not verified until observed on a running app.
+- [x] Inspect rebuild branch and preserve legacy Expo on main.
+- [x] Vendor pinned pstack and verify all 58 skill entry points in CI.
+- [x] Create native Android Kotlin / Jetpack Compose / Material 3 app and compile in CI.
+- [x] Create native iOS SwiftUI app, compile and launch it on iOS simulator.
+- [x] Add text and image questions, four answer modes, and clearly labeled offline preview.
+- [x] Add bring-your-own-key Gemini 3.8 Flash inference with secure key storage.
+- [x] Add local history, bookmarks, 18-question offline practice, spaced review and progress on both platforms.
+- [x] Add JVM unit tests, CI-produced Android APK and iOS simulator app.
+- [x] Add Android instrumented test workflow and iOS simulator screenshot capture.
+
+## Verification in progress and outstanding
+
+- [ ] Android instrumented study journeys pass and screenshots are inspected.
+- [ ] Gemini mock HTTP request and rate-limit unit tests pass in CI.
+- [ ] Latest iOS layout screenshot inspected and its build passes.
+- [ ] Data survives app process restart on both platforms, verified by real instrumentation.
+- [ ] Live Gemini response verified with a consenting authorized test key and usage limits.
+- [ ] Accessibility, privacy, performance and physical-device release checks.
+
+## Production work beyond the native MVP
+
+- [ ] Authenticated inference backend and abuse protection for app-managed keys.
+- [ ] Larger, reviewed study question bank and generated practice sets / assessment.
+- [ ] Full request cancellation, retries, quotas and telemetry.
+- [ ] Signed Android and iOS builds, distribution and store reviews.
+
+A compile check does not prove runtime features. Mark a box complete only with matching evidence.
