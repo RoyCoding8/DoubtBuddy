@@ -17,4 +17,26 @@ final class DoubtBuddyUITests: XCTestCase {
         app.tabBars.buttons["Saved"].tap()
         XCTAssertTrue(app.staticTexts["Saved answers"].waitForExistence(timeout: 10))
     }
+
+    func testOfflineAnswerPersistsAfterRelaunch() {
+        let app = XCUIApplication()
+        app.launch()
+
+        let editor = app.textViews.firstMatch
+        XCTAssertTrue(editor.waitForExistence(timeout: 15))
+        editor.tap()
+        editor.typeText("What does Newton's second law say?")
+
+        let solve = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "Solve question")).firstMatch
+        XCTAssertTrue(solve.waitForExistence(timeout: 10))
+        XCTAssertTrue(solve.isEnabled)
+        solve.tap()
+        XCTAssertTrue(app.staticTexts["Your answer"].waitForExistence(timeout: 20))
+
+        app.terminate()
+        app.launch()
+        app.tabBars.buttons["Saved"].tap()
+        XCTAssertTrue(app.staticTexts["Saved answers"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts["What does Newton's second law say?"].waitForExistence(timeout: 10))
+    }
 }
