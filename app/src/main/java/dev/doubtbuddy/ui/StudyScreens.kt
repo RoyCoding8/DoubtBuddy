@@ -1,6 +1,6 @@
 package dev.doubtbuddy.ui
 
-import android.util.Base64
+import java.io.File
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
@@ -22,7 +22,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
-import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AssistChip
@@ -59,6 +59,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import dev.doubtbuddy.StudyViewModel
 import dev.doubtbuddy.data.ImageAttachment
+import dev.doubtbuddy.data.CameraCapture
 import dev.doubtbuddy.domain.Doubt
 import dev.doubtbuddy.domain.QuestionBank
 import dev.doubtbuddy.domain.SolveMode
@@ -105,15 +106,19 @@ fun AskScreen(vm: StudyViewModel, onSettings: () -> Unit) {
     val context = LocalContext.current
     val solve by vm.solveState.collectAsState()
     val configured by vm.hasApiKey.collectAsState()
-    val picker = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-        if (uri != null) runCatching {
-            val bytes = context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
-                ?: error("Cannot open image.")
-            require(bytes.size <= 6_000_000) { "Choose an image smaller than 6 MB." }
-            attachment = ImageAttachment(context.contentResolver.getType(uri) ?: "image/jpeg",
-                Base64.encodeToString(bytes, Base64.NO_WRAP))
-            imageError = null
-        }.onFailure { imageError = it.message ?: "Could not attach image." }
+    var pendingCameraFile by rememberSaveable { mutableStateOf<String?>(null) }
+    val camera = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { taken ->
+        val path = pendingCameraFile
+        pendingCameraFile = null
+        if (path != null) {
+            val file = File(path)
+            if (taken) {
+                runCatching { CameraCapture.encode(file) }
+                    .onSuccess { attachment = it; imageError = null }
+                    .onFailure { imageError = it.message ?: "Could not read the photo." }
+            }
+            file.delete()
+        }
     }
     Column(Modifier.fillMaxSize()) {
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(20.dp),
@@ -141,10 +146,20 @@ fun AskScreen(vm: StudyViewModel, onSettings: () -> Unit) {
                 maxLines = 9
             )
             Row(verticalAlignment = Alignment.CenterVertically) {
-                OutlinedButton(onClick = { picker.launch("image/*") }) {
-                    Icon(Icons.Default.Image, contentDescription = null)
+                OutlinedButton(onClick = {
+                    runCatching {
+                        val target = CameraCapture.createTarget(context)
+                        pendingCameraFile = target.file.absolutePath
+                        camera.launch(target.uri)
+                    }.onFailure {
+                        pendingCameraFile?.let { path -> File(path).delete() }
+                        pendingCameraFile = null
+                        imageError = "Camera unavailable. Please try again."
+                    }
+                }) {
+                    Icon(Icons.Default.CameraAlt, contentDescription = null)
                     Spacer(Modifier.width(6.dp))
-                    Text(if (attachment == null) "Attach image" else "Image attached")
+                    Text(if (attachment == null) "Take photo" else "Retake photo")
                 }
                 if (attachment != null) TextButton(onClick = { attachment = null }) { Text("Remove") }
             }
