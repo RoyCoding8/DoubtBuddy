@@ -20,7 +20,11 @@ else
   status=1
 fi
 
-./gradlew --no-daemon :app:connectedDebugAndroidTest || status=$?
+if ./gradlew --no-daemon :app:connectedDebugAndroidTest; then
+  bash scripts/verify-android-process-restart.sh || status=$?
+else
+  status=$?
+fi
 adb logcat -d -t 900 > evidence/android-last-logcat.txt || true
 printf 'Android emulator verification exit code: %s\n' "$status"
 exit "$status"

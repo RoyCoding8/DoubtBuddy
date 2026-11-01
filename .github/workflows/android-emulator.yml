@@ -7,6 +7,7 @@ on:
       - "app/src/androidTest/**"
       - "app/src/main/**"
       - "scripts/verify-android-emulator.sh"
+      - "scripts/verify-android-process-restart.sh"
       - "gradlew"
       - "gradle/wrapper/**"
   workflow_dispatch:
