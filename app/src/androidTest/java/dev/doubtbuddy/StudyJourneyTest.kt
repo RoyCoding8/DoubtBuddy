@@ -4,6 +4,7 @@ import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.printToLog
 import androidx.compose.ui.test.performClick
@@ -16,7 +17,8 @@ class StudyJourneyTest {
 
     @Test fun solveOfflineAndFindSavedAnswer() {
         compose.onNode(hasSetTextAction()).performTextInput("What is Newton's second law?")
-        compose.onNodeWithText("Solve question").performClick()
+        compose.waitForIdle()
+        compose.onNodeWithText("Solve question").assertIsEnabled().performClick()
         compose.onRoot().printToLog("DOUBTBUDDY_AFTER_SUBMIT")
         compose.waitUntil(30_000) {
             compose.onAllNodesWithText("Your answer").fetchSemanticsNodes().isNotEmpty() ||
