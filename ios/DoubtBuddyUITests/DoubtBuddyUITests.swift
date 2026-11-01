@@ -37,6 +37,7 @@ final class DoubtBuddyUITests: XCTestCase {
         app.launch()
         app.tabBars.buttons["Saved"].tap()
         XCTAssertTrue(app.staticTexts["Saved answers"].waitForExistence(timeout: 10))
-        XCTAssertTrue(app.staticTexts["What does Newton's second law say?"].waitForExistence(timeout: 10))
+        let saved = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "What does Newton's second law say?")).firstMatch
+        XCTAssertTrue(saved.waitForExistence(timeout: 10))
     }
 }
