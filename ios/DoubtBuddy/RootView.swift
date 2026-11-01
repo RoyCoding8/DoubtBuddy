@@ -117,13 +117,21 @@ struct AskView: View {
                     Text("01  Subject").font(.headline)
                     SubjectPicker(selection: $subject)
                     Text("02  Your question").font(.headline)
-                    TextEditor(text: $question)
-                        .frame(minHeight: 132)
-                        .scrollContentBackground(.hidden)
-                        .padding(6)
-                        .background(Color(uiColor: .tertiarySystemFill),
-                                    in: RoundedRectangle(cornerRadius: 14))
-                        .onChange(of: question) { _, _ in store.clearAnswer() }
+                    ZStack(alignment: .topLeading) {
+                        if question.isEmpty {
+                            Text("Type your JEE question here...")
+                                .foregroundStyle(.secondary)
+                                .padding(.leading, 12).padding(.top, 14)
+                                .allowsHitTesting(false)
+                        }
+                        TextEditor(text: $question)
+                            .frame(minHeight: 96)
+                            .scrollContentBackground(.hidden)
+                            .padding(6)
+                            .onChange(of: question) { _, _ in store.clearAnswer() }
+                    }
+                    .background(Color(uiColor: .tertiarySystemFill),
+                                in: RoundedRectangle(cornerRadius: 14))
                     HStack {
                         PhotosPicker(selection: $photo, matching: .images) {
                             Label(imageData == nil ? "Attach image" : "Image attached", systemImage: "photo")
@@ -198,6 +206,7 @@ struct AskView: View {
         }
         .background(Color(uiColor: .systemGroupedBackground))
         .navigationTitle("DoubtBuddy")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 
@@ -261,6 +270,7 @@ struct PracticeView: View {
         }
         .background(Color(uiColor: .systemGroupedBackground))
         .navigationTitle("DoubtBuddy")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 
@@ -310,6 +320,7 @@ struct ReviewView: View {
         }
         .background(Color(uiColor: .systemGroupedBackground))
         .navigationTitle("DoubtBuddy")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 
@@ -353,6 +364,7 @@ struct ProgressViewPage: View {
         }
         .background(Color(uiColor: .systemGroupedBackground))
         .navigationTitle("DoubtBuddy")
+        .navigationBarTitleDisplayMode(.inline)
     }
 
     private func metric(_ value: String, _ label: String) -> some View {
@@ -404,6 +416,7 @@ struct SavedView: View {
         }
         .background(Color(uiColor: .systemGroupedBackground))
         .navigationTitle("DoubtBuddy")
+        .navigationBarTitleDisplayMode(.inline)
         .sheet(item: $opened) { doubt in
             NavigationStack {
                 ScrollView {
