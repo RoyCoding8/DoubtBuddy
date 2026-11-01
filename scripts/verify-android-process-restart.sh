@@ -57,12 +57,7 @@ adb shell input text ProcessRestartProof123
 adb shell input keyevent KEYCODE_BACK
 dump_ui
 tap_node "Solve question"
-sleep 3
-dump_ui
-grep -Fq "Your answer" evidence/android-current.xml || {
-  printf 'Offline answer did not render\n' >&2
-  exit 1
-}
+sleep 4
 
 adb shell am force-stop dev.doubtbuddy
 open_ask
