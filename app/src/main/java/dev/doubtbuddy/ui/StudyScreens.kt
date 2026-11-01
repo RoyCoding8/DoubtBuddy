@@ -48,6 +48,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -68,6 +69,9 @@ import dev.doubtbuddy.domain.StudyStats
 import dev.doubtbuddy.domain.Subject
 import java.text.DateFormat
 import java.util.Date
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Composable
 private fun PageIntro(overline: String, title: String, subtitle: String) {
@@ -104,6 +108,7 @@ fun AskScreen(vm: StudyViewModel, onSettings: () -> Unit) {
     var attachment by remember { mutableStateOf<ImageAttachment?>(null) }
     var imageError by remember { mutableStateOf<String?>(null) }
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     val solve by vm.solveState.collectAsState()
     val configured by vm.hasApiKey.collectAsState()
     var pendingCameraFile by rememberSaveable { mutableStateOf<String?>(null) }
@@ -113,11 +118,16 @@ fun AskScreen(vm: StudyViewModel, onSettings: () -> Unit) {
         if (path != null) {
             val file = File(path)
             if (taken) {
-                runCatching { CameraCapture.encode(file) }
-                    .onSuccess { attachment = it; imageError = null }
-                    .onFailure { imageError = it.message ?: "Could not read the photo." }
+                scope.launch {
+                    val result = withContext(Dispatchers.IO) {
+                        runCatching { CameraCapture.encode(file) }.also { file.delete() }
+                    }
+                    result.onSuccess { attachment = it; imageError = null }
+                        .onFailure { imageError = it.message ?: "Could not read the photo." }
+                }
+            } else {
+                file.delete()
             }
-            file.delete()
         }
     }
     Column(Modifier.fillMaxSize()) {
