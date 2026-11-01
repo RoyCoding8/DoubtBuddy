@@ -19,6 +19,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
@@ -54,6 +56,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
@@ -232,16 +235,23 @@ fun PracticeScreen(vm: StudyViewModel) {
             Text(item.chapter.uppercase(), color = MaterialTheme.colorScheme.primary)
             Text("Question " + (index + 1), style = MaterialTheme.typography.labelMedium)
             Text(item.question, style = MaterialTheme.typography.titleLarge)
-            item.choices.forEachIndexed { i, choice ->
-                Surface(
-                    modifier = Modifier.fillMaxWidth().clickable(enabled = !submitted) { selection = i },
-                    shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
-                    color = if (selection == i) MaterialTheme.colorScheme.secondaryContainer
-                        else MaterialTheme.colorScheme.surfaceContainerHigh
-                ) {
-                    Text(('A' + i).toString() + ".  " + choice,
-                        Modifier.padding(horizontal = 18.dp, vertical = 16.dp),
-                        style = MaterialTheme.typography.bodyLarge)
+            Column(Modifier.selectableGroup()) {
+                item.choices.forEachIndexed { i, choice ->
+                    Surface(
+                        modifier = Modifier.fillMaxWidth().selectable(
+                            selected = selection == i,
+                            enabled = !submitted,
+                            role = Role.RadioButton,
+                            onClick = { selection = i }
+                        ),
+                        shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
+                        color = if (selection == i) MaterialTheme.colorScheme.secondaryContainer
+                            else MaterialTheme.colorScheme.surfaceContainerHigh
+                    ) {
+                        Text(('A' + i).toString() + ".  " + choice,
+                            Modifier.padding(horizontal = 18.dp, vertical = 16.dp),
+                            style = MaterialTheme.typography.bodyLarge)
+                    }
                 }
             }
             if (!submitted) Button(onClick = { vm.recordAttempt(item, selection); submitted = true },

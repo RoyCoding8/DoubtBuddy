@@ -12,6 +12,8 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.assertIsEnabled
+import androidx.compose.ui.test.assertIsSelected
+import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.printToLog
 import androidx.compose.ui.test.performClick
@@ -53,6 +55,17 @@ class StudyJourneyTest {
         } finally {
             Intents.release()
         }
+    }
+
+    @Test fun practiceAnswerExposesSelectionToAccessibility() {
+        compose.onNodeWithText("Practice").performClick()
+        compose.onNodeWithText("25 m", substring = true).assertIsNotSelected().performClick()
+        compose.onNodeWithText("25 m", substring = true).assertIsSelected()
+        compose.onNodeWithText("10 m", substring = true).performClick()
+        compose.onNodeWithText("25 m", substring = true).assertIsNotSelected()
+        compose.onNodeWithText("10 m", substring = true).assertIsSelected()
+        compose.onNodeWithText("Check answer").performClick()
+        compose.onNodeWithText("10 m", substring = true).assertIsSelected()
     }
 
     @Test fun practiceShowsExplanationAndProgress() {
