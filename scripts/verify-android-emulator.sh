@@ -5,9 +5,13 @@ mkdir -p evidence
 status=0
 gradle --no-daemon :app:connectedDebugAndroidTest || status=$?
 
-if adb shell am start -n dev.doubtbuddy/.MainActivity; then
+if adb install -r app/build/outputs/apk/debug/app-debug.apk &&
+   adb shell am start -n dev.doubtbuddy/.MainActivity; then
   sleep 5
-  adb exec-out screencap -p > evidence/android-home.png || true
+  adb exec-out screencap -p > evidence/android-home.png || status=1
+  test -s evidence/android-home.png || status=1
+else
+  status=1
 fi
 
 adb logcat -d -t 900 > evidence/android-last-logcat.txt || true
