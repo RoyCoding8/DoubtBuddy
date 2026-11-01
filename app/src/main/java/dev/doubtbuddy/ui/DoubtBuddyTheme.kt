@@ -1,5 +1,6 @@
 package dev.doubtbuddy.ui
 
+import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
@@ -8,8 +9,10 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.view.WindowCompat
 
 private val light = lightColorScheme(
     primary = Color(0xFF445D9D),
@@ -45,6 +48,14 @@ fun DoubtBuddyTheme(content: @Composable () -> Unit) {
         Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> dynamicLightColorScheme(context)
         night -> dark
         else -> light
+    }
+    SideEffect {
+        (context as? Activity)?.window?.let { window ->
+            WindowCompat.getInsetsController(window, window.decorView).apply {
+                isAppearanceLightStatusBars = !night
+                isAppearanceLightNavigationBars = !night
+            }
+        }
     }
     MaterialTheme(colorScheme = scheme, content = content)
 }
