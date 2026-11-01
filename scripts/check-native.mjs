@@ -9,6 +9,8 @@ const required = [
   "app/src/main/java/dev/doubtbuddy/MainActivity.kt",
   "app/src/main/java/dev/doubtbuddy/data/StudyDatabase.kt",
   "app/src/main/java/dev/doubtbuddy/data/GeminiClient.kt",
+  "app/src/main/java/dev/doubtbuddy/data/CameraCapture.kt",
+  "app/src/main/res/xml/camera_paths.xml",
   "ios/project.yml",
   "ios/DoubtBuddy/DoubtBuddyApp.swift",
   "ios/DoubtBuddy/StudyStore.swift",
@@ -34,4 +36,11 @@ if (!manifest.includes('id("com.android.application")') || !manifest.includes("m
 if (!swift.includes("import SwiftUI") || !compose.includes("import androidx.compose")) {
   throw new Error("Native UI entry points missing");
 }
-console.log("Verified independent native Android and iOS project structure");
+const androidQuestionUI = readFileSync(
+  join(root, "app/src/main/java/dev/doubtbuddy/ui/StudyScreens.kt"), "utf8"
+);
+if (!androidQuestionUI.includes("ActivityResultContracts.TakePicture()") ||
+    /ActivityResultContracts\.(GetContent|PickVisualMedia)/.test(androidQuestionUI)) {
+  throw new Error("Android question photos must use camera capture, not a gallery picker");
+}
+console.log("Verified independent native Android/iOS projects and camera-only Android input");
