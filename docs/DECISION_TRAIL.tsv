@@ -9,3 +9,7 @@ ts	phase	decision	why	evidence	result
 2026-11-01T09:58:00Z	verify	Launch iOS simulator and inspect screenshot	Prove it works beyond compile	workflow 41290979284; screenshot artifact 13077002905	launched; layout iteration ongoing
 2026-11-01T10:00:00Z	verify	Add Android UI and mock Gemini tests	Test behavior, not implementation	commit 7292f827; commit 97ae2975	in progress
 2026-11-01T10:03:00Z	fix	Replace internal JDK HTTP test server	Use supported test network boundary	commit cae3ef64	CI pending
+2026-11-01T09:26:43Z	ios	Drive native tab navigation in XCTest	Prove interactions on a simulator	workflow 41292598272; commit b2c9650c	VERIFIED
+2026-11-01T09:29:47Z	android	Pin Solve action above navigation after keyboard overlay failure	Fix root cause of unclickable offscreen button	workflow 41293011178; commit 6092cc55	VERIFIED
+2026-11-01T09:26:24Z	build	Install reproducible Gradle wrapper and rebase safely	Build the lever without overwriting concurrent commits	workflow 41293064720; commit 1f3da988	VERIFIED
+2026-11-01T09:36:39Z	android	Recompile with committed wrapper and source checks	Verify distributable native Android project	workflow 41293658102; commit 076cf34c	VERIFIED
