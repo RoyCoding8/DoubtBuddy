@@ -115,8 +115,9 @@ fun AskScreen(vm: StudyViewModel, onSettings: () -> Unit) {
             imageError = null
         }.onFailure { imageError = it.message ?: "Could not attach image." }
     }
-    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(20.dp),
-        verticalArrangement = Arrangement.spacedBy(18.dp)) {
+    Column(Modifier.fillMaxSize()) {
+        Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(18.dp)) {
         PageIntro("YOUR STUDY SPACE", "What are you stuck on?", "Ask a question and choose how you want to learn.")
         if (!configured) Surface(
             modifier = Modifier.fillMaxWidth().clickable(onClick = onSettings),
@@ -154,15 +155,7 @@ fun AskScreen(vm: StudyViewModel, onSettings: () -> Unit) {
                     FilterChip(selected = mode == choice, onClick = { mode = choice }, label = { Text(choice.label) })
                 }
             }
-            Button(onClick = { vm.solve(subject, mode, question, attachment) },
-                enabled = (question.isNotBlank() || attachment != null) && solve !is SolveState.Loading,
-                modifier = Modifier.fillMaxWidth()) {
-                if (solve is SolveState.Loading) CircularProgressIndicator(
-                    Modifier.size(18.dp), strokeWidth = 2.dp, color = MaterialTheme.colorScheme.onPrimary
-                ) else Icon(Icons.Default.Send, contentDescription = null)
-                Spacer(Modifier.width(8.dp))
-                Text(if (solve is SolveState.Loading) "Thinking..." else "Solve question")
-            }
+
         }
         when (val result = solve) {
             is SolveState.Answer -> ContentCard {
@@ -182,6 +175,18 @@ fun AskScreen(vm: StudyViewModel, onSettings: () -> Unit) {
                 Text("Check your connection and retry.", style = MaterialTheme.typography.bodySmall)
             }
             else -> Unit
+        }
+        }
+        Surface(modifier = Modifier.fillMaxWidth(), tonalElevation = 3.dp) {
+            Button(onClick = { vm.solve(subject, mode, question, attachment) },
+                enabled = (question.isNotBlank() || attachment != null) && solve !is SolveState.Loading,
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 10.dp)) {
+                if (solve is SolveState.Loading) CircularProgressIndicator(
+                    Modifier.size(18.dp), strokeWidth = 2.dp, color = MaterialTheme.colorScheme.onPrimary
+                ) else Icon(Icons.Default.Send, contentDescription = null)
+                Spacer(Modifier.width(8.dp))
+                Text(if (solve is SolveState.Loading) "Thinking..." else "Solve question")
+            }
         }
     }
 }
