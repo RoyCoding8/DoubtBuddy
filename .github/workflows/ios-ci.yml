@@ -14,6 +14,7 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v4
+      - run: node scripts/check-native.mjs && node scripts/check-pstack.mjs
       - name: Install XcodeGen
         run: brew install xcodegen
       - name: Generate native project

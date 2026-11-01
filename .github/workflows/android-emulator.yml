@@ -36,11 +36,15 @@ jobs:
           profile: pixel_7
           disable-animations: true
           script: |
+            set +e
             gradle --no-daemon :app:connectedDebugAndroidTest
+            verdict=$?
+            mkdir -p evidence
             adb shell am start -n dev.doubtbuddy/.MainActivity
             sleep 5
-            mkdir -p evidence
             adb exec-out screencap -p > evidence/android-home.png
+            adb logcat -d -t 600 > evidence/android-last-logcat.txt
+            exit "$verdict"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
