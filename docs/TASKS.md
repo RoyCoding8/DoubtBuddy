@@ -28,9 +28,10 @@
 - [x] iOS native tab navigation passes XCTest on the simulator. iOS CI 41292598272.
 - [x] iOS offline answer survives app termination and relaunch. XCTest workflow 41293790329.
 - [x] Android saved answer survives database close and reopen. Instrumented workflow 41293658080.
-- [ ] Android history survives full app process termination and relaunch (not yet directly tested).
+- [x] Android history survives full app process termination and relaunch. Emulator run 41361965543, saved-screen XML and screenshot, with 6/6 instrumented tests passing.
 - [ ] Live Gemini response verified with a consenting authorized test key and usage limits.
-- [ ] Accessibility, privacy, performance and physical-device release checks.
+- [x] Android practice choices expose radio-button selection semantics. Emulator run 41361965543 validated selection and re-selection with Compose UI tests.
+- [ ] Remaining accessibility audit, privacy, performance and physical-device release checks.
 
 ## Production work beyond the native MVP
 
