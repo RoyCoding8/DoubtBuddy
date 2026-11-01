@@ -3,12 +3,10 @@ package dev.doubtbuddy
 import android.app.Activity
 import android.app.Instrumentation
 import android.provider.MediaStore
+import android.net.Uri
 import androidx.test.espresso.intent.Intents
-import androidx.test.espresso.intent.Intents.intended
 import androidx.test.espresso.intent.Intents.intending
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasAction
-import androidx.test.espresso.intent.matcher.IntentMatchers.hasExtraWithKey
-import org.hamcrest.Matchers.allOf
 import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
@@ -19,6 +17,7 @@ import androidx.compose.ui.test.printToLog
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import org.junit.Rule
+import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class StudyJourneyTest {
@@ -47,11 +46,10 @@ class StudyJourneyTest {
             intending(hasAction(MediaStore.ACTION_IMAGE_CAPTURE))
                 .respondWith(Instrumentation.ActivityResult(Activity.RESULT_CANCELED, null))
             compose.onNodeWithText("Take photo").performClick()
-            intended(allOf(
-                hasAction(MediaStore.ACTION_IMAGE_CAPTURE),
-                hasExtraWithKey(MediaStore.EXTRA_OUTPUT)
-            ))
-            compose.onNodeWithText("Take photo").assertExists()
+            val captured = Intents.getIntents()
+                .firstOrNull { it.action == MediaStore.ACTION_IMAGE_CAPTURE }
+                ?: error("No camera capture intent was sent.")
+            assertEquals("content", captured.getParcelableExtra<Uri>(MediaStore.EXTRA_OUTPUT)?.scheme)
         } finally {
             Intents.release()
         }
