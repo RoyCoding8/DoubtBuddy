@@ -168,19 +168,6 @@ struct AskView: View {
                             }
                         }
                     }
-                    Button {
-                        store.solve(subject: subject, mode: mode, question: question, image: imageData)
-                    } label: {
-                        HStack {
-                            if store.solveStatus == .loading { SwiftUI.ProgressView().tint(.white) }
-                            else { Image(systemName: "paperplane.fill") }
-                            Text(store.solveStatus == .loading ? "Thinking..." : "Solve question")
-                        }
-                        .frame(maxWidth: .infinity)
-                    }
-                    .buttonStyle(.borderedProminent).tint(accent)
-                    .disabled((question.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && imageData == nil)
-                              || store.solveStatus == .loading)
                 }
                 switch store.solveStatus {
                 case let .answer(text, sample):
@@ -207,6 +194,26 @@ struct AskView: View {
         .background(Color(uiColor: .systemGroupedBackground))
         .navigationTitle("DoubtBuddy")
         .navigationBarTitleDisplayMode(.inline)
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            Button {
+                store.solve(subject: subject, mode: mode, question: question, image: imageData)
+            } label: {
+                HStack(spacing: 9) {
+                    if store.solveStatus == .loading { SwiftUI.ProgressView().tint(.white) }
+                    else { Image(systemName: "paperplane.fill") }
+                    Text(store.solveStatus == .loading ? "Thinking..." : "Solve question")
+                }
+                .font(.headline)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 8)
+            }
+            .buttonStyle(.borderedProminent).tint(accent)
+            .disabled((question.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && imageData == nil)
+                      || store.solveStatus == .loading)
+            .padding(.horizontal, 20)
+            .padding(.vertical, 8)
+            .background(.regularMaterial)
+        }
     }
 }
 
