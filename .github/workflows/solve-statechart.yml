@@ -1,0 +1,30 @@
+name: Solve lifecycle statechart
+on:
+  push:
+    branches: [rebuild/native-from-scratch]
+    paths:
+      - "formal/**"
+      - "scripts/verify-solve-statechart.sh"
+      - ".github/workflows/solve-statechart.yml"
+  workflow_dispatch:
+jobs:
+  model:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - run: bash scripts/verify-solve-statechart.sh
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: solve-statechart
+          path: evidence/solve-statechart/**
