@@ -37,7 +37,7 @@ if (!swift.includes("import SwiftUI") || !compose.includes("import androidx.comp
   throw new Error("Native UI entry points missing");
 }
 const androidQuestionUI = readFileSync(
-  join(root, "app/src/main/java/dev/doubtbuddy/ui/StudyScreens.kt"), "utf8"
+  join(root, "app/src/main/java/dev/doubtbuddy/ui/AskScreen.kt"), "utf8"
 );
 if (!androidQuestionUI.includes("ActivityResultContracts.TakePicture()") ||
     !androidQuestionUI.includes("ActivityResultContracts.PickVisualMedia()") ||
