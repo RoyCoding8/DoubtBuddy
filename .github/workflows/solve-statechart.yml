@@ -4,6 +4,9 @@ on:
     branches: [rebuild/native-from-scratch]
     paths:
       - "formal/**"
+      - "app/src/main/java/dev/doubtbuddy/domain/SolveLifecycle.kt"
+      - "app/src/main/java/dev/doubtbuddy/StudyViewModel.kt"
+      - "ios/DoubtBuddy/StudyStore.swift"
       - "scripts/verify-solve-statechart.sh"
       - ".github/workflows/solve-statechart.yml"
   workflow_dispatch:

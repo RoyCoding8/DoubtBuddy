@@ -8,7 +8,7 @@ DoubtBuddy is a native JEE study companion for Physics, Chemistry and Mathematic
 - iOS: Swift, SwiftUI, native system materials, file-backed JSON and Keychain.
 - No Expo, React Native or JavaScript UI runtime.
 
-Both clients provide text and image questions, four answer styles, history, bookmarks, offline practice, spaced review and progress. On Android, question photos are taken with the system camera only; there is no gallery picker or camera permission request. iOS still uses its native photo picker. The offline question bank currently has 18 curated questions. Without an API key, AI answers are clearly marked local previews, not real solutions.
+Both clients provide text and image questions, four answer styles, history, bookmarks, offline practice, spaced review and progress. On Android, questions can use the system camera or the gallery photo picker without broad photo-library permission. iOS supports gallery selection through PhotosPicker. The offline question bank currently has 18 curated questions. Without an API key, AI answers are clearly marked local previews, not real solutions.
 
 ## Android
 
@@ -49,4 +49,4 @@ This is a bring-your-own-key development architecture. A public production servi
     node scripts/check-pstack.mjs
     node scripts/check-native.mjs
 
-The pstack router is pstack/skills/poteto-mode/SKILL.md. See docs/REBUILD_PLAN.md, docs/TASKS.md and docs/DECISION_TRAIL.tsv for scope, gates and evidence. All new work is on rebuild/native-from-scratch; legacy Expo stays on main.
+The pstack router is pstack/skills/poteto-mode/SKILL.md. See docs/ARCHITECTURE.md, docs/REBUILD_PLAN.md, docs/TASKS.md and docs/DECISION_TRAIL.tsv for module ownership, formal model checks, scope and evidence. All new work is on rebuild/native-from-scratch; legacy Expo stays on main.

@@ -7,6 +7,13 @@ const required = [
   "app/build.gradle.kts",
   "app/src/main/AndroidManifest.xml",
   "app/src/main/java/dev/doubtbuddy/MainActivity.kt",
+  "app/src/main/java/dev/doubtbuddy/StudyViewModel.kt",
+  "app/src/main/java/dev/doubtbuddy/domain/SolveLifecycle.kt",
+  "app/src/main/java/dev/doubtbuddy/ui/StudyComponents.kt",
+  "app/src/main/java/dev/doubtbuddy/ui/AskScreen.kt",
+  "app/src/main/java/dev/doubtbuddy/ui/PracticeAndReviewScreens.kt",
+  "app/src/main/java/dev/doubtbuddy/ui/ProgressAndHistoryScreens.kt",
+  "app/src/main/java/dev/doubtbuddy/ui/SettingsScreen.kt",
   "app/src/main/java/dev/doubtbuddy/data/StudyDatabase.kt",
   "app/src/main/java/dev/doubtbuddy/data/GeminiClient.kt",
   "app/src/main/java/dev/doubtbuddy/data/CameraCapture.kt",
@@ -15,6 +22,10 @@ const required = [
   "ios/DoubtBuddy/DoubtBuddyApp.swift",
   "ios/DoubtBuddy/StudyStore.swift",
   "ios/DoubtBuddy/RootView.swift",
+  "ios/DoubtBuddy/StudyComponents.swift",
+  "ios/DoubtBuddy/AskView.swift",
+  "ios/DoubtBuddy/PracticeReviewViews.swift",
+  "ios/DoubtBuddy/ProgressSavedSettingsViews.swift",
   "pstack/skills/poteto-mode/SKILL.md"
 ];
 
