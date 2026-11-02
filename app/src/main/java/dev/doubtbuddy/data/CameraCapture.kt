@@ -22,6 +22,31 @@ object CameraCapture {
         return CameraTarget(uri, file)
     }
 
+    fun encode(context: Context, uri: Uri): ImageAttachment {
+        val directory = File(context.cacheDir, "questions").apply { mkdirs() }
+        val file = File.createTempFile("gallery-", ".img", directory)
+        try {
+            val input = context.contentResolver.openInputStream(uri)
+                ?: throw IOException("Could not open the selected photo.")
+            input.use { source ->
+                file.outputStream().use { destination ->
+                    val buffer = ByteArray(8192)
+                    var total = 0L
+                    while (true) {
+                        val count = source.read(buffer)
+                        if (count < 0) break
+                        total += count
+                        if (total > 30_000_000L) throw IOException("Selected photo is too large to import.")
+                        destination.write(buffer, 0, count)
+                    }
+                }
+            }
+            return encode(file)
+        } finally {
+            file.delete()
+        }
+    }
+
     fun encode(file: File): ImageAttachment {
         val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
         BitmapFactory.decodeFile(file.absolutePath, options)

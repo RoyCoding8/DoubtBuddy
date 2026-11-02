@@ -2,6 +2,7 @@ package dev.doubtbuddy
 
 import android.app.Activity
 import android.app.Instrumentation
+import android.content.Intent
 import android.provider.MediaStore
 import android.net.Uri
 import androidx.test.espresso.intent.Intents
@@ -18,6 +19,7 @@ import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.printToLog
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
+import dev.doubtbuddy.data.CameraCapture
 import org.junit.Rule
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -54,6 +56,39 @@ class StudyJourneyTest {
             assertEquals("content", captured.getParcelableExtra<Uri>(MediaStore.EXTRA_OUTPUT)?.scheme)
         } finally {
             Intents.release()
+        }
+    }
+
+    @Test fun galleryPhotoCanBeSelectedAndSolvedWithoutQuestionText() {
+        val context = compose.activity
+        val target = CameraCapture.createTarget(context)
+        val bitmap = android.graphics.Bitmap.createBitmap(200, 160, android.graphics.Bitmap.Config.ARGB_8888)
+        bitmap.eraseColor(android.graphics.Color.WHITE)
+        target.file.outputStream().use { bitmap.compress(android.graphics.Bitmap.CompressFormat.JPEG, 85, it) }
+        bitmap.recycle()
+        Intents.init()
+        try {
+            intending(hasAction(MediaStore.ACTION_PICK_IMAGES))
+                .respondWith(Instrumentation.ActivityResult(Activity.RESULT_OK,
+                    Intent().setData(target.uri).addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)))
+            compose.onNodeWithText("Gallery").performClick()
+            val picked = Intents.getIntents().firstOrNull { it.action == MediaStore.ACTION_PICK_IMAGES }
+                ?: error("System photo picker was not launched.")
+            assertEquals("image/*", picked.type)
+            compose.waitUntil(30_000) {
+                compose.onAllNodesWithText("Photo attached").fetchSemanticsNodes().isNotEmpty()
+            }
+            compose.onNodeWithText("Solve question").assertIsEnabled().performClick()
+            compose.waitUntil(30_000) {
+                compose.onAllNodesWithText("Your answer").fetchSemanticsNodes().isNotEmpty() ||
+                    compose.onAllNodesWithText("Could not solve").fetchSemanticsNodes().isNotEmpty()
+            }
+            compose.onNodeWithText("Your answer").assertExists()
+            compose.onNodeWithText("Saved").performClick()
+            compose.onNodeWithText("Image question").assertExists()
+        } finally {
+            Intents.release()
+            target.file.delete()
         }
     }
 

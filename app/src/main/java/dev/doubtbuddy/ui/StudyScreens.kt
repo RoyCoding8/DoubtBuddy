@@ -3,6 +3,7 @@ package dev.doubtbuddy.ui
 import java.io.File
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -25,6 +26,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AssistChip
@@ -125,11 +127,22 @@ fun AskScreen(vm: StudyViewModel, onSettings: () -> Unit) {
                     val result = withContext(Dispatchers.IO) {
                         runCatching { CameraCapture.encode(file) }.also { file.delete() }
                     }
-                    result.onSuccess { attachment = it; imageError = null }
+                    result.onSuccess { attachment = it; imageError = null; vm.clearAnswer() }
                         .onFailure { imageError = it.message ?: "Could not read the photo." }
                 }
             } else {
                 file.delete()
+            }
+        }
+    }
+    val gallery = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+        if (uri != null) {
+            scope.launch {
+                val result = withContext(Dispatchers.IO) {
+                    runCatching { CameraCapture.encode(context, uri) }
+                }
+                result.onSuccess { attachment = it; imageError = null; vm.clearAnswer() }
+                    .onFailure { imageError = it.message ?: "Could not read the selected photo." }
             }
         }
     }
@@ -158,7 +171,11 @@ fun AskScreen(vm: StudyViewModel, onSettings: () -> Unit) {
                 placeholder = { Text("Type your JEE question here...") },
                 maxLines = 9
             )
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
                 OutlinedButton(onClick = {
                     runCatching {
                         val target = CameraCapture.createTarget(context)
@@ -174,8 +191,19 @@ fun AskScreen(vm: StudyViewModel, onSettings: () -> Unit) {
                     Spacer(Modifier.width(6.dp))
                     Text(if (attachment == null) "Take photo" else "Retake photo")
                 }
-                if (attachment != null) TextButton(onClick = { attachment = null }) { Text("Remove") }
+                OutlinedButton(onClick = {
+                    gallery.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                }) {
+                    Icon(Icons.Default.PhotoLibrary, contentDescription = null)
+                    Spacer(Modifier.width(6.dp))
+                    Text("Gallery")
+                }
+                if (attachment != null) TextButton(onClick = {
+                    attachment = null
+                    vm.clearAnswer()
+                }) { Text("Remove image") }
             }
+            if (attachment != null) Text("Photo attached", color = MaterialTheme.colorScheme.primary)
             if (imageError != null) Text(imageError.orEmpty(), color = MaterialTheme.colorScheme.error)
             Text("03  Answer style", style = MaterialTheme.typography.titleSmall)
             Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {

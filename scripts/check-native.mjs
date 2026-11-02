@@ -40,7 +40,12 @@ const androidQuestionUI = readFileSync(
   join(root, "app/src/main/java/dev/doubtbuddy/ui/StudyScreens.kt"), "utf8"
 );
 if (!androidQuestionUI.includes("ActivityResultContracts.TakePicture()") ||
-    /ActivityResultContracts\.(GetContent|PickVisualMedia)/.test(androidQuestionUI)) {
-  throw new Error("Android question photos must use camera capture, not a gallery picker");
+    !androidQuestionUI.includes("ActivityResultContracts.PickVisualMedia()") ||
+    !androidQuestionUI.includes("PickVisualMedia.ImageOnly")) {
+  throw new Error("Android question photos must support both camera capture and an image-only system picker");
 }
-console.log("Verified independent native Android/iOS projects and camera-only Android input");
+const androidManifest = readFileSync(join(root, "app/src/main/AndroidManifest.xml"), "utf8");
+if (/android.permission.READ_(EXTERNAL_STORAGE|MEDIA_IMAGES)/.test(androidManifest)) {
+  throw new Error("Gallery selection must not require broad photo library permission");
+}
+console.log("Verified native Android/iOS apps and camera plus permission-free gallery input");
