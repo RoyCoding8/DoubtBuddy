@@ -21,6 +21,7 @@ cat "$scratch/legacy.log"
 test "$legacy_status" -eq 1
 grep -q "NoStaleAnswer" "$scratch/legacy-chart/report.md"
 grep -q "NoStaleFailure" "$scratch/legacy-chart/report.md"
+grep -q "you change the question: Question changed while answer loads" "$scratch/legacy-chart/report.md"
 cp "$scratch/legacy-chart/report.md" "$repo/evidence/solve-statechart/legacy-report.md"
 cp "$scratch/legacy-chart/chart.mmd" "$repo/evidence/solve-statechart/legacy-chart.mmd"
 

@@ -41,7 +41,13 @@ Edit ==
 
 LegacyEdit ==
     /\ draft' = IF draft = "A" THEN "B" ELSE "A"
-    /\ UNCHANGED <<phase, active, pending, used, source, visible, saved, failedFrom>>
+    /\ IF phase = "Loading"
+          THEN /\ UNCHANGED <<phase, active, visible, failedFrom>>
+          ELSE /\ phase' = "Idle"
+               /\ active' = 0
+               /\ visible' = None
+               /\ failedFrom' = None
+    /\ UNCHANGED <<pending, used, source, saved>>
 
 Complete(r) ==
     /\ r \in pending
