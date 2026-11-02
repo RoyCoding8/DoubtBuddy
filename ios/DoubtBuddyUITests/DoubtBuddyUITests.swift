@@ -18,6 +18,23 @@ final class DoubtBuddyUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Saved answers"].waitForExistence(timeout: 10))
     }
 
+
+    func testEditingQuestionClearsAnOldAnswer() {
+        let app = XCUIApplication()
+        app.launch()
+
+        let editor = app.textViews.firstMatch
+        XCTAssertTrue(editor.waitForExistence(timeout: 15))
+        editor.tap()
+        editor.typeText("Original physics question")
+        app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "Solve question")).firstMatch.tap()
+        XCTAssertTrue(app.staticTexts["Your answer"].waitForExistence(timeout: 20))
+
+        editor.tap()
+        editor.typeText(" updated")
+        XCTAssertFalse(app.staticTexts["Your answer"].exists)
+    }
+
     func testOfflineAnswerPersistsAfterRelaunch() {
         let app = XCUIApplication()
         app.launch()

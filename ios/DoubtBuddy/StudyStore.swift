@@ -98,6 +98,8 @@ final class StudyStore: ObservableObject {
     @Published private(set) var hasKey = false
 
     private let fileURL: URL
+    private var solveGeneration = 0
+    private var solveTask: Task<Void, Never>?
 
     init() {
         let folder = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
@@ -124,7 +126,10 @@ final class StudyStore: ObservableObject {
     }
 
     func clearAnswer() {
-        if solveStatus != .loading { solveStatus = .idle }
+        solveGeneration += 1
+        solveTask?.cancel()
+        solveTask = nil
+        solveStatus = .idle
     }
 
     func solve(subject: Subject, mode: SolveMode, question: String, image: Data? = nil, mimeType: String = "image/jpeg") {
@@ -138,8 +143,10 @@ final class StudyStore: ObservableObject {
             solveStatus = .failure("Keep questions under 6,000 characters.")
             return
         }
+        solveGeneration += 1
+        let generation = solveGeneration
         solveStatus = .loading
-        Task {
+        solveTask = Task {
             do {
                 let key = KeyVault.get()
                 let sample = (key ?? "").isEmpty
@@ -154,11 +161,16 @@ final class StudyStore: ObservableObject {
                         "Start with the relevant principle or formula before substituting values.\n\n" +
                         "Add your Gemini API key in Settings for a worked solution."
                 }
+                try Task.checkCancellation()
+                guard generation == solveGeneration else { return }
                 doubts.insert(Doubt(id: UUID(), subject: subject, question: trimmed.isEmpty ? "Image question" : trimmed,
                     answer: answer, mode: mode, createdAt: Date(), isSample: sample), at: 0)
                 persist()
                 solveStatus = .answer(answer, sample: sample)
+            } catch is CancellationError {
+                return
             } catch {
+                guard generation == solveGeneration, !Task.isCancelled else { return }
                 solveStatus = .failure(error.localizedDescription)
             }
         }

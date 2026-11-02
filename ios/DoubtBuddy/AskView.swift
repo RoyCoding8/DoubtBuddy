@@ -27,6 +27,7 @@ struct AskView: View {
                 SoftCard {
                     Text("01  Subject").font(.headline)
                     SubjectPicker(selection: $subject)
+                        .onChange(of: subject) { _, _ in store.clearAnswer() }
                     Text("02  Your question").font(.headline)
                     ZStack(alignment: .topLeading) {
                         if question.isEmpty {
@@ -49,13 +50,19 @@ struct AskView: View {
                         }
                         .buttonStyle(.bordered)
                         if imageData != nil {
-                            Button("Remove") { imageData = nil; photo = nil }
+                            Button("Remove") {
+                                imageData = nil
+                                photo = nil
+                                imageError = nil
+                                store.clearAnswer()
+                            }
                                 .buttonStyle(.borderless)
                         }
                     }
                     .onChange(of: photo) { _, selected in
+                        guard let selected else { return }
                         Task {
-                            guard let data = try? await selected?.loadTransferable(type: Data.self),
+                            guard let data = try? await selected.loadTransferable(type: Data.self),
                                   let jpeg = UIImage(data: data)?.jpegData(compressionQuality: 0.8),
                                   jpeg.count <= 6_000_000 else {
                                 imageError = "Choose an image smaller than 6 MB."
@@ -63,6 +70,7 @@ struct AskView: View {
                             }
                             imageData = jpeg
                             imageError = nil
+                            store.clearAnswer()
                         }
                     }
                     if let imageError { Text(imageError).font(.caption).foregroundStyle(.red) }
@@ -70,7 +78,12 @@ struct AskView: View {
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack {
                             ForEach(SolveMode.allCases) { option in
-                                Button(option.label) { mode = option }
+                                Button(option.label) {
+                                    if mode != option {
+                                        mode = option
+                                        store.clearAnswer()
+                                    }
+                                }
                                     .font(.subheadline)
                                     .padding(10)
                                     .foregroundStyle(mode == option ? accent : .primary)
