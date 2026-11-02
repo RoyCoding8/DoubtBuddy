@@ -13,11 +13,14 @@
 - [x] Commit official Gradle 8.14.3 wrapper for reproducible Android builds.
 - [x] Add Android instrumented test workflow and iOS simulator screenshot capture.
 
-## Camera-only question input
+## Camera and gallery question input
 
-- [x] Replace gallery input with system camera-only capture; Android compile and unit tests passed in run 41310283465.
+- [x] Implement system camera capture without a broad photo-library permission. Initial compile and unit tests passed in run 41310283465.
 - [x] Verify camera intent, FileProvider URI, image preparation, and cancellation on emulator. Run 41310283489: 5 tests passed.
 - [x] Inspect camera-only Material 3 question screen and rerun Android UI journeys. Screenshot captured in run 41310283489.
+- [x] Add Android system photo picker for gallery images alongside camera capture. Bound temporary URI import to 30 MB and reuse JPEG preparation without requesting storage permission. Android CI 41390376001 passed.
+- [x] Verify gallery picker selection, image-only offline question, and imported JPEG on Android emulator. Run 41390376084 passed 8/8 instrumented tests and the full app restart check.
+- [x] Confirm iOS already supports gallery image selection through PhotosPicker in ios/DoubtBuddy/RootView.swift. iOS was not changed or rerun in this iteration.
 
 ## Verification in progress and outstanding
 
