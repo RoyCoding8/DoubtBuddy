@@ -20,7 +20,17 @@
 - [x] Inspect camera-only Material 3 question screen and rerun Android UI journeys. Screenshot captured in run 41310283489.
 - [x] Add Android system photo picker for gallery images alongside camera capture. Bound temporary URI import to 30 MB and reuse JPEG preparation without requesting storage permission. Android CI 41390376001 passed.
 - [x] Verify gallery picker selection, image-only offline question, and imported JPEG on Android emulator. Run 41390376084 passed 8/8 instrumented tests and the full app restart check.
-- [x] Confirm iOS already supports gallery image selection through PhotosPicker in ios/DoubtBuddy/RootView.swift. iOS was not changed or rerun in this iteration.
+- [x] Confirm iOS already supports gallery image selection through PhotosPicker in ios/DoubtBuddy/AskView.swift. The later iOS UI refactor and simulator tests passed in run 41422860264.
+
+## Native modules and solve lifecycle verification
+
+- [x] Split Android Compose screens into Ask, Practice/Review, Progress/Saved, Settings and shared components. Android CI 41420363749 and emulator 41420363855 passed after the mechanical split.
+- [x] Split iOS SwiftUI screens into the corresponding feature files and shared components. iOS simulator run 41421818137 passed.
+- [x] Use pstack statechart and TLC to check stale solve answers and failures. The corrected legacy model reproduced both errors, and the new bounded model passed all five invariants in formal run 41421667693.
+- [x] Reject stale Android results when a question, subject, answer style or photo changes. Android CI 41421745116 and emulator 41421745127 passed 9/9 instrumented tests, including saved-history process restart.
+- [x] Reject stale iOS results using Task cancellation and solve generations. Simulator CI 41422860264 passed 3/3 UI tests, including editing an answered question and restart persistence.
+- [x] Publish native module responsibilities, replay steps and formal-model scope in docs/ARCHITECTURE.md.
+- [ ] Verify canceled live provider calls, photo preparation races, concurrent disk writes and crash recovery outside the bounded formal model. Measure image memory and app responsiveness before claiming performance gains.
 
 ## Verification in progress and outstanding
 
