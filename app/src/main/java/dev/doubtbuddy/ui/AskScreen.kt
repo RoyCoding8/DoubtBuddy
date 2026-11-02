@@ -112,11 +112,16 @@ fun AskScreen(vm: StudyViewModel, onSettings: () -> Unit) {
         }
         ContentCard {
             Text("01  Subject", style = MaterialTheme.typography.titleSmall)
-            SubjectPicker(subject) { subject = it }
+            SubjectPicker(subject) {
+                if (subject != it) {
+                    subject = it
+                    vm.clearAnswer()
+                }
+            }
             Text("02  Your question", style = MaterialTheme.typography.titleSmall)
             OutlinedTextField(
                 value = question,
-                onValueChange = { question = it; if (solve !is SolveState.Loading) vm.clearAnswer() },
+                onValueChange = { question = it; vm.clearAnswer() },
                 modifier = Modifier.fillMaxWidth().heightIn(min = 150.dp),
                 placeholder = { Text("Type your JEE question here...") },
                 maxLines = 9
@@ -158,7 +163,12 @@ fun AskScreen(vm: StudyViewModel, onSettings: () -> Unit) {
             Text("03  Answer style", style = MaterialTheme.typography.titleSmall)
             Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 SolveMode.entries.forEach { choice ->
-                    FilterChip(selected = mode == choice, onClick = { mode = choice }, label = { Text(choice.label) })
+                    FilterChip(selected = mode == choice, onClick = {
+                        if (mode != choice) {
+                            mode = choice
+                            vm.clearAnswer()
+                        }
+                    }, label = { Text(choice.label) })
                 }
             }
 

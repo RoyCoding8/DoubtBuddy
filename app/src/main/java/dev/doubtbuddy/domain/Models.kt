@@ -49,7 +49,7 @@ data class PracticeAttempt(
 
 sealed interface SolveState {
     data object Idle : SolveState
-    data object Loading : SolveState
+    data class Loading(val requestId: Long) : SolveState
     data class Answer(val text: String, val isSample: Boolean) : SolveState
     data class Failure(val message: String) : SolveState
 }

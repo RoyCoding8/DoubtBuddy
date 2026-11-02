@@ -13,6 +13,7 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.assertIsEnabled
+import androidx.compose.ui.test.assertDoesNotExist
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.onRoot
@@ -90,6 +91,18 @@ class StudyJourneyTest {
             Intents.release()
             target.file.delete()
         }
+    }
+
+    @Test fun editingAnAnsweredQuestionClearsTheOldAnswer() {
+        compose.onNode(hasSetTextAction()).performTextInput("Initial question")
+        compose.onNodeWithText("Solve question").performClick()
+        compose.waitUntil(30_000) {
+            compose.onAllNodesWithText("Your answer").fetchSemanticsNodes().isNotEmpty()
+        }
+        compose.onNodeWithText("Your answer").assertExists()
+        compose.onNode(hasSetTextAction()).performTextInput(" changed")
+        compose.waitForIdle()
+        compose.onNodeWithText("Your answer").assertDoesNotExist()
     }
 
     @Test fun practiceAnswerExposesSelectionToAccessibility() {

@@ -11,10 +11,15 @@ import dev.doubtbuddy.domain.Doubt
 import dev.doubtbuddy.domain.PracticeAttempt
 import dev.doubtbuddy.domain.PracticeQuestion
 import dev.doubtbuddy.domain.SolveMode
+import dev.doubtbuddy.domain.SolveLifecycle
 import dev.doubtbuddy.domain.SolveState
 import dev.doubtbuddy.domain.Subject
 import java.util.UUID
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -29,8 +34,9 @@ class StudyViewModel(application: Application) : AndroidViewModel(application) {
     val history = _history.asStateFlow()
     private val _attempts = MutableStateFlow(database.attempts())
     val attempts = _attempts.asStateFlow()
-    private val _solveState = MutableStateFlow<SolveState>(SolveState.Idle)
-    val solveState = _solveState.asStateFlow()
+    private val solveLifecycle = SolveLifecycle()
+    val solveState = solveLifecycle.state
+    private var solveJob: Job? = null
     private val _hasApiKey = MutableStateFlow(!vault.load().isNullOrBlank())
     val hasApiKey = _hasApiKey.asStateFlow()
 
@@ -40,22 +46,24 @@ class StudyViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun clearAnswer() {
-        if (_solveState.value !is SolveState.Loading) _solveState.value = SolveState.Idle
+        solveJob?.cancel()
+        solveJob = null
+        solveLifecycle.invalidate()
     }
 
     fun solve(subject: Subject, mode: SolveMode, question: String, image: ImageAttachment? = null) {
         val trimmed = question.trim()
-        if (_solveState.value is SolveState.Loading) return
+        if (solveState.value is SolveState.Loading) return
         if (trimmed.isBlank() && image == null) {
-            _solveState.value = SolveState.Failure("Enter a question or attach an image.")
+            solveLifecycle.reject("Enter a question or attach an image.")
             return
         }
         if (trimmed.length > 6000) {
-            _solveState.value = SolveState.Failure("Keep the question under 6,000 characters.")
+            solveLifecycle.reject("Keep the question under 6,000 characters.")
             return
         }
-        _solveState.value = SolveState.Loading
-        viewModelScope.launch {
+        val requestId = solveLifecycle.begin() ?: return
+        solveJob = viewModelScope.launch {
             try {
                 val key = vault.load()
                 val isSample = key.isNullOrBlank()
@@ -71,11 +79,19 @@ class StudyViewModel(application: Application) : AndroidViewModel(application) {
                     UUID.randomUUID().toString(), subject, trimmed.ifBlank { "Image question" },
                     answer, mode, System.currentTimeMillis(), isSample
                 )
-                withContext(Dispatchers.IO) { database.saveDoubt(doubt) }
-                _history.value = listOf(doubt) + _history.value
-                _solveState.value = SolveState.Answer(answer, isSample)
+                if (!solveLifecycle.accepts(requestId)) return@launch
+                withContext(Dispatchers.IO) {
+                    currentCoroutineContext().ensureActive()
+                    database.saveDoubt(doubt)
+                }
+                if (solveLifecycle.accepts(requestId)) {
+                    _history.value = listOf(doubt) + _history.value
+                    solveLifecycle.complete(requestId, answer, isSample)
+                }
+            } catch (cancelled: CancellationException) {
+                throw cancelled
             } catch (error: Exception) {
-                _solveState.value = SolveState.Failure(error.message ?: "Something went wrong. Please retry.")
+                solveLifecycle.fail(requestId, error.message ?: "Something went wrong. Please retry.")
             }
         }
     }
