@@ -1,5 +1,6 @@
 import SwiftUI
 import PhotosUI
+import ImageIO
 import UIKit
 
 struct AskView: View {
@@ -10,6 +11,8 @@ struct AskView: View {
     @State private var photo: PhotosPickerItem?
     @State private var imageData: Data?
     @State private var imageError: String?
+    @State private var photoRevision = 0
+    @State private var preparingPhoto = false
 
     var body: some View {
         ScrollView {
@@ -46,31 +49,47 @@ struct AskView: View {
                                 in: RoundedRectangle(cornerRadius: 14))
                     HStack {
                         PhotosPicker(selection: $photo, matching: .images) {
-                            Label(imageData == nil ? "Attach image" : "Image attached", systemImage: "photo")
+                            Label(preparingPhoto ? "Preparing photo" : (imageData == nil ? "Attach image" : "Image attached"),
+                                  systemImage: "photo")
                         }
                         .buttonStyle(.bordered)
-                        if imageData != nil {
+                        if imageData != nil || preparingPhoto {
                             Button("Remove") {
+                                photoRevision += 1
+                                preparingPhoto = false
                                 imageData = nil
-                                photo = nil
                                 imageError = nil
+                                photo = nil
                                 store.clearAnswer()
                             }
-                                .buttonStyle(.borderless)
+                            .buttonStyle(.borderless)
                         }
                     }
                     .onChange(of: photo) { _, selected in
+                        photoRevision += 1
+                        let ticket = photoRevision
                         guard let selected else { return }
+                        imageData = nil
+                        imageError = nil
+                        preparingPhoto = true
+                        store.clearAnswer()
                         Task {
-                            guard let data = try? await selected.loadTransferable(type: Data.self),
-                                  let jpeg = UIImage(data: data)?.jpegData(compressionQuality: 0.8),
-                                  jpeg.count <= 6_000_000 else {
-                                imageError = "Choose an image smaller than 6 MB."
-                                return
+                            let loaded = try? await selected.loadTransferable(type: Data.self)
+                            let jpeg: Data?
+                            if let loaded {
+                                jpeg = await Task.detached(priority: .userInitiated) {
+                                    prepareQuestionPhoto(loaded)
+                                }.value
+                            } else {
+                                jpeg = nil
                             }
-                            imageData = jpeg
-                            imageError = nil
-                            store.clearAnswer()
+                            guard ticket == photoRevision else { return }
+                            preparingPhoto = false
+                            if let jpeg {
+                                imageData = jpeg
+                            } else {
+                                imageError = "Could not prepare this photo. Choose a smaller image."
+                            }
                         }
                     }
                     if let imageError { Text(imageError).font(.caption).foregroundStyle(.red) }
@@ -133,10 +152,24 @@ struct AskView: View {
             }
             .buttonStyle(.borderedProminent).tint(accent)
             .disabled((question.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && imageData == nil)
-                      || store.solveStatus == .loading)
+                      || preparingPhoto || store.solveStatus == .loading)
             .padding(.horizontal, 20)
             .padding(.vertical, 8)
             .background(.regularMaterial)
         }
     }
+}
+
+private func prepareQuestionPhoto(_ data: Data) -> Data? {
+    guard data.count <= 30_000_000,
+          let source = CGImageSourceCreateWithData(data as CFData, nil) else { return nil }
+    let options: [CFString: Any] = [
+        kCGImageSourceCreateThumbnailFromImageAlways: true,
+        kCGImageSourceCreateThumbnailWithTransform: true,
+        kCGImageSourceThumbnailMaxPixelSize: 2200
+    ]
+    guard let image = CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary),
+          let jpeg = UIImage(cgImage: image).jpegData(compressionQuality: 0.8),
+          jpeg.count <= 6_000_000 else { return nil }
+    return jpeg
 }
