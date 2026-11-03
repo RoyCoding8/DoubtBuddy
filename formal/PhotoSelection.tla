@@ -64,13 +64,21 @@ LegacyFailed(r) ==
     /\ errorFrom' = r
     /\ UNCHANGED <<selected, used, attached, oldAnswer>>
 
+Done ==
+    /\ used = Photos
+    /\ pending = {}
+    /\ selected = None
+    /\ UNCHANGED vars
+
 Next ==
+    \/ Done
     \/ \E r \in Photos: Select(r)
     \/ Remove
     \/ \E r \in Photos: Ready(r)
     \/ \E r \in Photos: Failed(r)
 
 LegacyNext ==
+    \/ Done
     \/ \E r \in Photos: LegacySelect(r)
     \/ Remove
     \/ \E r \in Photos: LegacyReady(r)
