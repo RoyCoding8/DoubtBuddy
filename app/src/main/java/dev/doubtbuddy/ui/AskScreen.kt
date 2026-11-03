@@ -46,7 +46,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import dev.doubtbuddy.StudyViewModel
-import dev.doubtbuddy.data.ImageAttachment
 import dev.doubtbuddy.data.CameraCapture
 import dev.doubtbuddy.domain.SolveMode
 import dev.doubtbuddy.domain.SolveState
@@ -60,8 +59,12 @@ fun AskScreen(vm: StudyViewModel, onSettings: () -> Unit) {
     var subject by rememberSaveable { mutableStateOf(Subject.PHYSICS) }
     var mode by rememberSaveable { mutableStateOf(SolveMode.GUIDED) }
     var question by rememberSaveable { mutableStateOf("") }
-    var attachment by remember { mutableStateOf<ImageAttachment?>(null) }
-    var imageError by remember { mutableStateOf<String?>(null) }
+    val photoInput = remember { PhotoInputSession() }
+    val photoState = photoInput.state
+    val attachment = (photoState as? PhotoInputState.Ready)?.attachment
+    val preparingPhoto = photoState is PhotoInputState.Preparing
+    val imageError = (photoState as? PhotoInputState.Failed)?.message
+    var launchError by remember { mutableStateOf<String?>(null) }
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val solve by vm.solveState.collectAsState()
@@ -73,12 +76,15 @@ fun AskScreen(vm: StudyViewModel, onSettings: () -> Unit) {
         if (path != null) {
             val file = File(path)
             if (taken) {
+                val ticket = photoInput.begin()
+                launchError = null
+                vm.clearAnswer()
                 scope.launch {
                     val result = withContext(Dispatchers.IO) {
                         runCatching { CameraCapture.encode(file) }.also { file.delete() }
                     }
-                    result.onSuccess { attachment = it; imageError = null; vm.clearAnswer() }
-                        .onFailure { imageError = it.message ?: "Could not read the photo." }
+                    result.onSuccess { photoInput.complete(ticket, it) }
+                        .onFailure { photoInput.fail(ticket, it.message ?: "Could not read the photo.") }
                 }
             } else {
                 file.delete()
@@ -87,12 +93,15 @@ fun AskScreen(vm: StudyViewModel, onSettings: () -> Unit) {
     }
     val gallery = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
         if (uri != null) {
+            val ticket = photoInput.begin()
+            launchError = null
+            vm.clearAnswer()
             scope.launch {
                 val result = withContext(Dispatchers.IO) {
                     runCatching { CameraCapture.encode(context, uri) }
                 }
-                result.onSuccess { attachment = it; imageError = null; vm.clearAnswer() }
-                    .onFailure { imageError = it.message ?: "Could not read the selected photo." }
+                result.onSuccess { photoInput.complete(ticket, it) }
+                    .onFailure { photoInput.fail(ticket, it.message ?: "Could not read the selected photo.") }
             }
         }
     }
@@ -139,7 +148,7 @@ fun AskScreen(vm: StudyViewModel, onSettings: () -> Unit) {
                     }.onFailure {
                         pendingCameraFile?.let { path -> File(path).delete() }
                         pendingCameraFile = null
-                        imageError = "Camera unavailable. Please try again."
+                        launchError = "Camera unavailable. Please try again."
                     }
                 }) {
                     Icon(Icons.Default.CameraAlt, contentDescription = null)
@@ -153,13 +162,17 @@ fun AskScreen(vm: StudyViewModel, onSettings: () -> Unit) {
                     Spacer(Modifier.width(6.dp))
                     Text("Gallery")
                 }
-                if (attachment != null) TextButton(onClick = {
-                    attachment = null
+                if (attachment != null || preparingPhoto) TextButton(onClick = {
+                    photoInput.remove()
+                    launchError = null
                     vm.clearAnswer()
                 }) { Text("Remove image") }
             }
+            if (preparingPhoto) Text("Preparing photo", color = MaterialTheme.colorScheme.primary)
             if (attachment != null) Text("Photo attached", color = MaterialTheme.colorScheme.primary)
-            if (imageError != null) Text(imageError.orEmpty(), color = MaterialTheme.colorScheme.error)
+            if (imageError != null || launchError != null) {
+                Text((imageError ?: launchError).orEmpty(), color = MaterialTheme.colorScheme.error)
+            }
             Text("03  Answer style", style = MaterialTheme.typography.titleSmall)
             Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 SolveMode.entries.forEach { choice ->
@@ -195,7 +208,7 @@ fun AskScreen(vm: StudyViewModel, onSettings: () -> Unit) {
         }
         Surface(modifier = Modifier.fillMaxWidth(), tonalElevation = 3.dp) {
             Button(onClick = { vm.solve(subject, mode, question, attachment) },
-                enabled = (question.isNotBlank() || attachment != null) && solve !is SolveState.Loading,
+                enabled = (question.isNotBlank() || attachment != null) && !preparingPhoto && solve !is SolveState.Loading,
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 10.dp)) {
                 if (solve is SolveState.Loading) CircularProgressIndicator(
                     Modifier.size(18.dp), strokeWidth = 2.dp, color = MaterialTheme.colorScheme.onPrimary

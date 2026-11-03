@@ -13,6 +13,7 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.assertIsEnabled
+import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.onRoot
@@ -86,6 +87,30 @@ class StudyJourneyTest {
             compose.onNodeWithText("Your answer").assertExists()
             compose.onNodeWithText("Saved").performClick()
             compose.onNodeWithText("Image question").assertExists()
+        } finally {
+            Intents.release()
+            target.file.delete()
+        }
+    }
+
+    @Test fun removingGalleryPhotoDisablesImageOnlySolve() {
+        val target = CameraCapture.createTarget(compose.activity)
+        val bitmap = android.graphics.Bitmap.createBitmap(180, 120, android.graphics.Bitmap.Config.ARGB_8888)
+        bitmap.eraseColor(android.graphics.Color.WHITE)
+        target.file.outputStream().use { bitmap.compress(android.graphics.Bitmap.CompressFormat.JPEG, 85, it) }
+        bitmap.recycle()
+        Intents.init()
+        try {
+            intending(hasAction(MediaStore.ACTION_PICK_IMAGES))
+                .respondWith(Instrumentation.ActivityResult(Activity.RESULT_OK,
+                    Intent().setData(target.uri).addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)))
+            compose.onNodeWithText("Gallery").performClick()
+            compose.waitUntil(30_000) {
+                compose.onAllNodesWithText("Photo attached").fetchSemanticsNodes().isNotEmpty()
+            }
+            compose.onNodeWithText("Remove image").performClick()
+            compose.onNodeWithText("Photo attached").assertDoesNotExist()
+            compose.onNodeWithText("Solve question").assertIsNotEnabled()
         } finally {
             Intents.release()
             target.file.delete()
