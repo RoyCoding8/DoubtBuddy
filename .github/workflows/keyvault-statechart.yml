@@ -1,0 +1,32 @@
+name: API key replacement statechart
+on:
+  push:
+    branches: [rebuild/native-from-scratch]
+    paths:
+      - "formal/KeyVaultReplacement*"
+      - "formal/keyvault-view.mjs"
+      - "scripts/verify-keyvault-statechart.sh"
+      - ".github/workflows/keyvault-statechart.yml"
+      - "ios/DoubtBuddy/StudyStore.swift"
+  workflow_dispatch:
+jobs:
+  model:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - run: bash scripts/verify-keyvault-statechart.sh
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: keyvault-statechart
+          path: evidence/keyvault-statechart/**
