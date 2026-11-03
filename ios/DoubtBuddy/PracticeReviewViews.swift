@@ -67,7 +67,7 @@ struct PracticeView: View {
 
 struct ReviewView: View {
     @EnvironmentObject private var store: StudyStore
-    @State private var revealed = false
+    @State private var revealedFor: String?
 
     private var due: [PracticeAttempt] { StudyStats.due(store.attempts) }
 
@@ -82,22 +82,22 @@ struct ReviewView: View {
                             .font(.subheadline).foregroundStyle(accent)
                         Text(question.chapter).font(.caption)
                         Text(question.text).font(.title3.weight(.medium))
-                        if revealed {
+                        if revealedFor == question.id {
                             Text("Answer: " + question.choices[question.correct]).font(.headline)
                             Text(question.explanation)
                             HStack {
                                 Button("Review again") {
                                     store.record(question, selected: (question.correct + 1) % 4, review: true)
-                                    revealed = false
+                                    revealedFor = nil
                                 }.buttonStyle(.bordered)
                                 Spacer()
                                 Button("Got it") {
                                     store.record(question, selected: question.correct, review: true)
-                                    revealed = false
+                                    revealedFor = nil
                                 }.buttonStyle(.borderedProminent).tint(accent)
                             }
                         } else {
-                            Button("Reveal answer") { revealed = true }
+                            Button("Reveal answer") { revealedFor = question.id }
                                 .buttonStyle(.borderedProminent).tint(accent)
                         }
                     }
@@ -112,5 +112,6 @@ struct ReviewView: View {
         .background(Color(uiColor: .systemGroupedBackground))
         .navigationTitle("DoubtBuddy")
         .navigationBarTitleDisplayMode(.inline)
+        .onChange(of: due.first?.questionId) { _, _ in revealedFor = nil }
     }
 }
