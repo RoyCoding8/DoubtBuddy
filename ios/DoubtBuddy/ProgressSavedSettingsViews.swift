@@ -129,7 +129,12 @@ struct SettingsView: View {
                         .textFieldStyle(.roundedBorder)
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled()
-                        .onChange(of: key) { _, _ in saved = false; keyFailure = false }
+                        .onChange(of: key) { _, newValue in
+                            if !newValue.isEmpty {
+                                saved = false
+                                keyFailure = false
+                            }
+                        }
                     Button("Save key securely") {
                         saved = store.saveKey(key)
                         keyFailure = !saved
