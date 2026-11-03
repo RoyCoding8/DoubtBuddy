@@ -35,6 +35,41 @@ final class DoubtBuddyUITests: XCTestCase {
         XCTAssertFalse(app.staticTexts["Your answer"].exists)
     }
 
+    func testReviewHidesPreviousRevealWhenDueQuestionChanges() {
+        let app = XCUIApplication()
+        app.launch()
+        app.tabBars.buttons["Practice"].tap()
+
+        let wrongFirst = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "10 m")).firstMatch
+        XCTAssertTrue(wrongFirst.waitForExistence(timeout: 10))
+        wrongFirst.tap()
+        app.buttons["Check answer"].tap()
+        app.buttons["Next question"].tap()
+
+        let wrongSecond = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "3 m/s²")).firstMatch
+        XCTAssertTrue(wrongSecond.waitForExistence(timeout: 10))
+        wrongSecond.tap()
+        app.buttons["Check answer"].tap()
+
+        app.tabBars.buttons["Review"].tap()
+        let reveal = app.buttons["Reveal answer"]
+        XCTAssertTrue(reveal.waitForExistence(timeout: 10))
+        reveal.tap()
+        XCTAssertTrue(app.staticTexts["Answer: 25 m"].waitForExistence(timeout: 10))
+
+        app.tabBars.buttons["Practice"].tap()
+        app.buttons["Chemistry"].tap()
+        app.buttons["Physics"].tap()
+        let rightFirst = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "25 m")).firstMatch
+        XCTAssertTrue(rightFirst.waitForExistence(timeout: 10))
+        rightFirst.tap()
+        app.buttons["Check answer"].tap()
+
+        app.tabBars.buttons["Review"].tap()
+        XCTAssertTrue(app.staticTexts["A net force of 12 N acts on a 3 kg body. Its acceleration is"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.buttons["Reveal answer"].waitForExistence(timeout: 10))
+    }
+
     func testOfflineAnswerPersistsAfterRelaunch() {
         let app = XCUIApplication()
         app.launch()
