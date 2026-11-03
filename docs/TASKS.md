@@ -32,6 +32,17 @@
 - [x] Publish native module responsibilities, replay steps and formal-model scope in docs/ARCHITECTURE.md.
 - [ ] Verify canceled live provider calls, photo preparation races, concurrent disk writes and crash recovery outside the bounded formal model. Measure image memory and app responsiveness before claiming performance gains.
 
+## Formal audit on November 3, 2026
+
+- [x] Check obsolete photo imports with pstack's TLA+ statechart. Legacy photo selection violates four safety rules; the revised bounded model passes in workflow 41631078255.
+- [x] Reject late gallery/camera photo imports and errors in Android. Run 41631537236 passed Android build and unit tests. Emulator run 41631537177 passed 10/10 UI tests and restart persistence.
+- [x] Check iOS review reveal across a changing due queue. TLC run 41632372061 found the two-step counterexample. iOS regression run 41632459399 reproduced the same UI bug.
+- [x] Bind iOS review reveal to the current question identifier. Commit 175a348; simulator verification is pending.
+- [x] Model failed API-key replacement and prevent deletion of the old iOS Keychain item before a replacement succeeds. TLC run 41633320933 passed the corrected model; simulator verification is pending.
+- [x] Clear old iOS answers at photo selection, discard obsolete photo results, and decode/downsample off the main thread. Commit e1594db; simulator verification is pending.
+- [ ] Finish iOS simulator verification for new photo, review, Keychain and restart persistence tests. One previous simulator run 41631720029 failed the saved-label check on relaunch; test  a6f836e now checks before and after persistence with a stable marker.
+- [ ] Verify real Gemini cancellation, physical photo pickers, disk-write failure handling, Android in-flight SQLite cancellation, and device memory usage.
+
 ## Verification in progress and outstanding
 
 - [x] Android instrumented study journeys pass and native screenshot inspected. Workflows 41293011178 and 41294583367.

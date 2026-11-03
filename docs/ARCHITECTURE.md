@@ -8,6 +8,7 @@ DoubtBuddy has separate native Android and iOS projects. Shared behavior is docu
 | --- | --- |
 | `MainActivity.kt` | Native navigation and application shell |
 | `ui/AskScreen.kt` | Question draft, camera and gallery input, answer presentation |
+| `ui/PhotoInputSession.kt` | Current photo request ticket and result state |
 | `ui/PracticeAndReviewScreens.kt` | Practice selection, grading and due review |
 | `ui/ProgressAndHistoryScreens.kt` | Progress and saved-answer views |
 | `ui/SettingsScreen.kt` | Bring-your-own-key settings |
@@ -54,3 +55,7 @@ The model verifies safety only for two requests and two question values. It abst
 Android tests and emulator journeys run in `.github/workflows/native-ci.yml` and `.github/workflows/android-emulator.yml`. iOS builds, simulator launch and XCTest journeys run in `.github/workflows/ios-ci.yml`.
 
 `scripts/check-native.mjs` checks the required native module entry points. It is not a replacement for compiling and running the applications.
+
+## Additional statecharts
+
+The November 3 audit adds bounded models for photo selection, review reveal, and Keychain replacement. The scripts and exact limitations are listed in [AUDIT_2026-11-03.md](AUDIT_2026-11-03.md).
