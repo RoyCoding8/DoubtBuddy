@@ -23,7 +23,11 @@ jobs:
         run: |
           xcodebuild -project ios/DoubtBuddy.xcodeproj -scheme DoubtBuddy -configuration Debug \
             -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' \
-            -derivedDataPath ios/DerivedData CODE_SIGNING_ALLOWED=NO build
+            -derivedDataPath ios/DerivedData CODE_SIGNING_ALLOWED=YES CODE_SIGN_IDENTITY="-" build
+      - name: Inspect simulator app signature
+        run: |
+          codesign -dv --verbose=2 ios/DerivedData/Build/Products/Debug-iphonesimulator/DoubtBuddy.app 2>&1
+          codesign -d --entitlements :- ios/DerivedData/Build/Products/Debug-iphonesimulator/DoubtBuddy.app 2>&1
       - uses: actions/upload-artifact@v4
         if: success()
         with:
@@ -46,7 +50,7 @@ jobs:
           test -n "$DEVICE"
           xcodebuild -project ios/DoubtBuddy.xcodeproj -scheme DoubtBuddy -configuration Debug \
             -destination "platform=iOS Simulator,id=$DEVICE" -derivedDataPath ios/DerivedData \
-            -parallel-testing-enabled NO CODE_SIGNING_ALLOWED=NO test
+            -parallel-testing-enabled NO CODE_SIGNING_ALLOWED=YES CODE_SIGN_IDENTITY="-" test
       - uses: actions/upload-artifact@v4
         if: always()
         with:
