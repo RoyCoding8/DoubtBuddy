@@ -24,18 +24,29 @@ enum KeyVault {
         return String(data: data, encoding: .utf8)
     }
 
-    static func save(_ value: String) {
+    @discardableResult
+    static func save(_ value: String) -> Bool {
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: service,
             kSecAttrAccount as String: account
         ]
-        SecItemDelete(query as CFDictionary)
-        guard !value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
-        var update = query
-        update[kSecValueData as String] = Data(value.trimmingCharacters(in: .whitespacesAndNewlines).utf8)
-        update[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
-        SecItemAdd(update as CFDictionary, nil)
+        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmed.isEmpty {
+            let status = SecItemDelete(query as CFDictionary)
+            return status == errSecSuccess || status == errSecItemNotFound
+        }
+
+        let data = Data(trimmed.utf8)
+        let attributes: [String: Any] = [kSecValueData as String: data]
+        let status = SecItemUpdate(query as CFDictionary, attributes as CFDictionary)
+        if status == errSecSuccess { return true }
+        guard status == errSecItemNotFound else { return false }
+
+        var item = query
+        item[kSecValueData as String] = data
+        item[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
+        return SecItemAdd(item as CFDictionary, nil) == errSecSuccess
     }
 }
 
@@ -120,9 +131,12 @@ final class StudyStore: ObservableObject {
         }
     }
 
-    func saveKey(_ key: String) {
-        KeyVault.save(key)
+    @discardableResult
+    func saveKey(_ key: String) -> Bool {
+        guard KeyVault.save(key) else { return false }
         hasKey = !(KeyVault.get() ?? "").isEmpty
+        let clearing = key.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        return clearing ? !hasKey : hasKey
     }
 
     func clearAnswer() {

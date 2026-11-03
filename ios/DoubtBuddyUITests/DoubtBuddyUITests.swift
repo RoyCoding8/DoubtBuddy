@@ -70,6 +70,23 @@ final class DoubtBuddyUITests: XCTestCase {
         XCTAssertTrue(app.buttons["Reveal answer"].waitForExistence(timeout: 10))
     }
 
+    func testSettingsCanReplaceAndRemoveStoredKey() {
+        let app = XCUIApplication()
+        app.launch()
+        app.buttons["Settings"].tap()
+
+        let editor = app.secureTextFields["New API key"]
+        XCTAssertTrue(editor.waitForExistence(timeout: 10))
+        editor.tap()
+        editor.typeText("local-test-key-never-sent")
+        app.buttons["Save key securely"].tap()
+        XCTAssertTrue(app.staticTexts["Your AI settings were updated."].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.buttons["Remove stored key"].exists)
+
+        app.buttons["Remove stored key"].tap()
+        XCTAssertTrue(app.staticTexts["No key configured. Answers use a clearly labeled sample."].waitForExistence(timeout: 10))
+    }
+
     func testOfflineAnswerPersistsAfterRelaunch() {
         let app = XCUIApplication()
         app.launch()

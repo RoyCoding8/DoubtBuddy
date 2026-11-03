@@ -114,6 +114,7 @@ struct SettingsView: View {
     @EnvironmentObject private var store: StudyStore
     @State private var key = ""
     @State private var saved = false
+    @State private var keyFailure = false
 
     var body: some View {
         ScrollView {
@@ -128,15 +129,23 @@ struct SettingsView: View {
                         .textFieldStyle(.roundedBorder)
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled()
+                        .onChange(of: key) { _, _ in saved = false; keyFailure = false }
                     Button("Save key securely") {
-                        store.saveKey(key); key = ""; saved = true
+                        saved = store.saveKey(key)
+                        keyFailure = !saved
+                        if saved { key = "" }
                     }.buttonStyle(.borderedProminent).tint(accent).disabled(key.isEmpty)
                     if store.hasKey {
                         Button("Remove stored key", role: .destructive) {
-                            store.saveKey(""); saved = true
+                            saved = store.saveKey("")
+                            keyFailure = !saved
                         }.buttonStyle(.bordered)
                     }
                     if saved { Text("Your AI settings were updated.").foregroundStyle(accent) }
+                    if keyFailure {
+                        Text("Could not update the key. Check your device and try again.")
+                            .foregroundStyle(.red)
+                    }
                     Text("Your key stays in iOS Keychain and is sent to Google's Gemini API over HTTPS. " +
                          "Google may process submitted questions. API usage may incur charges.")
                         .font(.caption).foregroundStyle(.secondary)
