@@ -94,7 +94,7 @@ final class DoubtBuddyUITests: XCTestCase {
         let editor = app.textViews.firstMatch
         XCTAssertTrue(editor.waitForExistence(timeout: 15))
         editor.tap()
-        editor.typeText("What does Newton's second law say?")
+        editor.typeText("PersistenceProbe2026Newton")
 
         let solve = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "Solve question")).firstMatch
         XCTAssertTrue(solve.waitForExistence(timeout: 10))
@@ -102,11 +102,16 @@ final class DoubtBuddyUITests: XCTestCase {
         solve.tap()
         XCTAssertTrue(app.staticTexts["Your answer"].waitForExistence(timeout: 20))
 
+        app.tabBars.buttons["Saved"].tap()
+        let before = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "PersistenceProbe2026Newton")).firstMatch
+        XCTAssertTrue(before.waitForExistence(timeout: 10), "Answer not present before relaunch.")
+        let savedLabel = before.label
+
         app.terminate()
         app.launch()
         app.tabBars.buttons["Saved"].tap()
         XCTAssertTrue(app.staticTexts["Saved answers"].waitForExistence(timeout: 10))
-        let saved = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "What does Newton's second law say?")).firstMatch
-        XCTAssertTrue(saved.waitForExistence(timeout: 10))
+        let saved = app.buttons[savedLabel]
+        XCTAssertTrue(saved.waitForExistence(timeout: 10), "Saved answer missing after relaunch. \(app.debugDescription)")
     }
 }
