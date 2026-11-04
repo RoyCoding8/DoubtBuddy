@@ -107,6 +107,8 @@ final class DoubtBuddyUITests: XCTestCase {
                       "Unexpected question editor value: \(submittedQuestion)")
 
         app.tabBars.buttons["Saved"].tap()
+        XCTAssertTrue(app.staticTexts["Saved answers"].waitForExistence(timeout: 10),
+                      "Saved tab did not open after solving a question.")
         let before = app.buttons.matching(NSPredicate(format: "label == %@", submittedQuestion)).firstMatch
         XCTAssertTrue(before.waitForExistence(timeout: 10),
                       "Saved question does not match the submitted text: \(submittedQuestion). \(app.debugDescription)")

@@ -13,6 +13,7 @@ struct AskView: View {
     @State private var imageError: String?
     @State private var photoRevision = 0
     @State private var preparingPhoto = false
+    @FocusState private var questionFocused: Bool
 
     var body: some View {
         ScrollView {
@@ -40,6 +41,7 @@ struct AskView: View {
                                 .allowsHitTesting(false)
                         }
                         TextEditor(text: $question)
+                            .focused($questionFocused)
                             .frame(minHeight: 96)
                             .scrollContentBackground(.hidden)
                             .padding(6)
@@ -139,6 +141,7 @@ struct AskView: View {
         .navigationBarTitleDisplayMode(.inline)
         .safeAreaInset(edge: .bottom, spacing: 0) {
             Button {
+                questionFocused = false
                 store.solve(subject: subject, mode: mode, question: question, image: imageData)
             } label: {
                 HStack(spacing: 9) {
