@@ -94,7 +94,7 @@ final class DoubtBuddyUITests: XCTestCase {
         let editor = app.textViews.firstMatch
         XCTAssertTrue(editor.waitForExistence(timeout: 15))
         editor.tap()
-        editor.typeText("PersistenceProbe2026Newton")
+        editor.typeText("Explain momentum conservation in a collision")
 
         let solve = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "Solve question")).firstMatch
         XCTAssertTrue(solve.waitForExistence(timeout: 10))
@@ -102,9 +102,14 @@ final class DoubtBuddyUITests: XCTestCase {
         solve.tap()
         XCTAssertTrue(app.staticTexts["Your answer"].waitForExistence(timeout: 20))
 
+        let submittedQuestion = (editor.value as? String ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        XCTAssertTrue(submittedQuestion.localizedCaseInsensitiveContains("momentum"),
+                      "Unexpected question editor value: \(submittedQuestion)")
+
         app.tabBars.buttons["Saved"].tap()
-        let before = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "PersistenceProbe2026Newton")).firstMatch
-        XCTAssertTrue(before.waitForExistence(timeout: 10), "Answer not present before relaunch.")
+        let before = app.buttons.matching(NSPredicate(format: "label == %@", submittedQuestion)).firstMatch
+        XCTAssertTrue(before.waitForExistence(timeout: 10),
+                      "Saved question does not match the submitted text: \(submittedQuestion). \(app.debugDescription)")
         let savedLabel = before.label
 
         app.terminate()
