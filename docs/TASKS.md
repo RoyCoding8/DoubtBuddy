@@ -37,10 +37,11 @@
 - [x] Check obsolete photo imports with pstack's TLA+ statechart. Legacy photo selection violates four safety rules; the revised bounded model passes in workflow 41631078255.
 - [x] Reject late gallery/camera photo imports and errors in Android. Run 41631537236 passed Android build and unit tests. Emulator run 41631537177 passed 10/10 UI tests and restart persistence.
 - [x] Check iOS review reveal across a changing due queue. TLC run 41632372061 found the two-step counterexample. iOS regression run 41632459399 reproduced the same UI bug.
-- [x] Bind iOS review reveal to the current question identifier. Commit 175a348; simulator verification is pending.
-- [x] Model failed API-key replacement and prevent deletion of the old iOS Keychain item before a replacement succeeds. TLC run 41633320933 passed the corrected model; simulator verification is pending.
-- [x] Clear old iOS answers at photo selection, discard obsolete photo results, and decode/downsample off the main thread. Commit e1594db; simulator verification is pending.
-- [ ] Finish iOS simulator verification for new photo, review, Keychain and restart persistence tests. One previous simulator run 41631720029 failed the saved-label check on relaunch; test  a6f836e now checks before and after persistence with a stable marker.
+- [x] Bind iOS review reveal to the current question identifier. Commit 175a348; simulator run 41754599696 passed the review regression.
+- [x] Prevent deleting a working iOS Keychain item before a replacement succeeds. TLC run 41633320933 passed the corrected model; simulator run 41754599696 passed key save/removal.
+- [x] Clear old iOS answers at photo selection, discard obsolete photo results, and downsample off the main thread. Commit e1594db; build and existing simulator journeys passed in run 41754599696. Live photo picker interactions remain unverified.
+- [x] Fix iOS simulator test-signing configuration and dismiss the question keyboard before tab navigation. Commits 8a4b532 and 4bd9d21; run 41754599696 passed 5/5 iOS UI journeys including saved-answer persistence across restart.
+- [ ] Verify actual iOS photo picker selection and image downsampling with a native gallery image on simulator or device.
 - [ ] Verify real Gemini cancellation, physical photo pickers, disk-write failure handling, Android in-flight SQLite cancellation, and device memory usage.
 
 ## Verification in progress and outstanding
